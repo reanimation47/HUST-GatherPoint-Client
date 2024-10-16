@@ -11,28 +11,55 @@ const password_placeholder = ref("Enter password")
 const input_username = ref("")
 const input_password = ref("")
 
+const input_username_anim_class = ref("")
+const input_password_anim_class = ref("")
+
+const delay = async (ms: number) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const LoginBtnClicked = async() => {
+    if (input_username.value === '')
+    {
+        username_placeholder.value = "Username CANNOT be empty!"
+        input_username_anim_class.value = "animate-bounce"
+        delay(1500).then(() => {
+            input_username_anim_class.value = ""
+        })
+        return
+    }
+    if (input_password.value === '')
+    {
+        password_placeholder.value = "Password CANNOT be empty!"
+        input_password_anim_class.value = "animate-bounce"
+        delay(1500).then(() => {
+            input_password_anim_class.value = ""
+        })
+        return
+    }
     try{
         titleText.value = "Trying to Login..." 
         
+        await delay(1000) //Fake loading time
+        
         const req_body: UserLoginRequestModel = {
-            username: "danny1",
-            password: "dannypass",
+            username: input_username.value,
+            password: input_password.value,
         }
         const login_response = await SendPostRequest("http://localhost:8000/user-login", req_body) as UserLoginResponseModel
         
         if (+login_response.code == CommonSuccessCode.APIRequestSuccess)
         {
-            
+            titleText.value = "Login success" 
+            //Move to main screen
         }else if (+login_response.code == APIErrorCode.UserLoginRequest_UsernameOrPasswordIsIncorrect)
         {
-            
+            titleText.value = "Login failed" 
+            password_placeholder.value = "Username or Password is incorrect"
+            input_password.value = ""
         }
-        titleText.value = login_response.message
         
         
-        password_placeholder.value = "Username or Password is incorrect"
-        input_password.value = ""
         
     }catch(e)
     {
@@ -84,12 +111,13 @@ const SendPostRequest = async (request_url:string ,body:any) => {
         <h3>{{ titleText }}</h3>
 
         <label for="username">Username</label>
-        <input type="text" :placeholder="username_placeholder" id="username" v-model="input_username">
+        <input :class="input_username_anim_class" type="text" :placeholder="username_placeholder" id="username" v-model="input_username">
 
         <label for="password">Password</label>
-        <input type="password" :placeholder="password_placeholder" id="password" v-model="input_password">
+        <input :class="input_password_anim_class" type="password" :placeholder="password_placeholder" id="password" v-model="input_password">
 
-        <button type="button" @click="LoginBtnClicked">Log In</button>
+        <button type="button" class="transition ease-in-out delay-0 bg-white hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="LoginBtnClicked">Log In</button>
+        <!-- <button type="button" class="" @click="LoginBtnClicked">Log In</button> -->
         <div class="social">
           <div class="go" type="button" @click="RegisterBtnClicked" ><i></i>Register</div>
           <div class="fb" @click="SkipBtnClicked"><i class=""></i>Skip</div>
@@ -101,6 +129,9 @@ const SendPostRequest = async (request_url:string ,body:any) => {
 </template>
 
 <style scoped>
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 *,
 *:before,
 *:after{
@@ -173,7 +204,7 @@ text-align: center;
 label{
 display: block;
 margin-top: 30px;
-font-size: 16px;
+font-size: 16px; 
 font-weight: 500;
 }
 input{
