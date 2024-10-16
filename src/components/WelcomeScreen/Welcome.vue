@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import {type UserLoginRequestModel } from '../../Models/API_Requests/API_Request_Models'
+import {APIErrorCode, CommonSuccessCode} from '../../Models/Common/ErrorCodes'
+import {type UserLoginResponseModel} from '../../Models/API_Responses/API_Response_Models'
 const titleText = ref("Login?")
 // const username_placeholder = ref("Enter username????")
 const username_placeholder = ref("Enter username")
@@ -8,14 +11,55 @@ const password_placeholder = ref("Enter password")
 const input_username = ref("")
 const input_password = ref("")
 
-const LoginBtnClicked = () => {
-    titleText.value = "Trying to Login..." 
-    password_placeholder.value = "Username or Password is incorrect"
-    input_password.value = ""
+const LoginBtnClicked = async() => {
+    try{
+        titleText.value = "Trying to Login..." 
+        
+        const req_body: UserLoginRequestModel = {
+            username: "danny1",
+            password: "dannypass",
+        }
+        const login_response = await SendPostRequest("http://localhost:8000/user-login", req_body) as UserLoginResponseModel
+        
+        if (+login_response.code == CommonSuccessCode.APIRequestSuccess)
+        {
+            
+        }else if (+login_response.code == APIErrorCode.UserLoginRequest_UsernameOrPasswordIsIncorrect)
+        {
+            
+        }
+        titleText.value = login_response.message
+        
+        
+        password_placeholder.value = "Username or Password is incorrect"
+        input_password.value = ""
+        
+    }catch(e)
+    {
+        console.log(e)
+    }
 }
 
+
 const RegisterBtnClicked = () => {
-    titleText.value = "Registering..." 
+    titleText.value = "Trying to register..." 
+}
+
+const SkipBtnClicked = () => {
+    titleText.value = "Skipping..." 
+}
+
+const SendPostRequest = async (request_url:string ,body:any) => {
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin':'*', 'Access-Control-Allow-Methods':'POST,PATCH,OPTIONS'},
+        body: JSON.stringify(body)
+    };
+    const response = await fetch(request_url, requestOptions)
+    const data = response.json()
+    return data
+        // .then(response => response.json())
+        // .then(data => console.log(data));
 }
 </script>
 
@@ -48,7 +92,7 @@ const RegisterBtnClicked = () => {
         <button type="button" @click="LoginBtnClicked">Log In</button>
         <div class="social">
           <div class="go" type="button" @click="RegisterBtnClicked" ><i></i>Register</div>
-          <div class="fb"><i class=""></i>Skip</div>
+          <div class="fb" @click="SkipBtnClicked"><i class=""></i>Skip</div>
         </div>
     </form>
 </body>
