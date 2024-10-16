@@ -14,6 +14,8 @@ const input_password = ref("")
 const input_username_anim_class = ref("")
 const input_password_anim_class = ref("")
 
+const input_anim_class = "animate-shake animate-once"
+
 const delay = async (ms: number) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -22,7 +24,7 @@ const LoginBtnClicked = async() => {
     if (input_username.value === '')
     {
         username_placeholder.value = "Username CANNOT be empty!"
-        input_username_anim_class.value = "animate-bounce"
+        input_username_anim_class.value = input_anim_class
         delay(1500).then(() => {
             input_username_anim_class.value = ""
         })
@@ -31,7 +33,7 @@ const LoginBtnClicked = async() => {
     if (input_password.value === '')
     {
         password_placeholder.value = "Password CANNOT be empty!"
-        input_password_anim_class.value = "animate-bounce"
+        input_password_anim_class.value = input_anim_class
         delay(1500).then(() => {
             input_password_anim_class.value = ""
         })
@@ -57,6 +59,12 @@ const LoginBtnClicked = async() => {
             titleText.value = "Login failed" 
             password_placeholder.value = "Username or Password is incorrect"
             input_password.value = ""
+            input_username_anim_class.value = input_anim_class
+            input_password_anim_class.value = input_anim_class
+            delay(1500).then(() => {
+                input_username_anim_class.value = ""
+                input_password_anim_class.value = ""
+            })
         }
         
         
