@@ -40,6 +40,7 @@ const LoginBtnClicked = async() => {
         return
     }
     try{
+        localStorage.setItem("lastEntered_username", input_username.value)
         titleText.value = "Trying to Login..." 
         
         await delay(1000) //Fake loading time
