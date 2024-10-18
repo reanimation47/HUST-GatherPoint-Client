@@ -3,12 +3,19 @@ import { ref } from 'vue';
 import {type UserLoginRequestModel } from '../../Models/API_Requests/API_Request_Models'
 import {APIErrorCode, CommonSuccessCode} from '../../Models/Common/ErrorCodes'
 import {type UserLoginResponseModel} from '../../Models/API_Responses/API_Response_Models'
+import {LStorage} from '../../configurations/localStorage_Keys'
+
+import { useRouter } from 'vue-router';
+import { RLinks } from '@/configurations/routerLinks';
+let router = useRouter()
+
 const titleText = ref("Login?")
 // const username_placeholder = ref("Enter username????")
 const username_placeholder = ref("Enter username")
 const password_placeholder = ref("Enter password")
 
-const input_username = ref("")
+const input_username =  ref(localStorage.getItem(LStorage.lastEntered_username) ?? "")
+
 const input_password = ref("")
 
 const input_username_anim_class = ref("")
@@ -54,6 +61,7 @@ const LoginBtnClicked = async() => {
         if (+login_response.code == CommonSuccessCode.APIRequestSuccess)
         {
             titleText.value = "Login success" 
+            router.push(RLinks.Home)
             //Move to main screen
         }else if (+login_response.code == APIErrorCode.UserLoginRequest_UsernameOrPasswordIsIncorrect)
         {
