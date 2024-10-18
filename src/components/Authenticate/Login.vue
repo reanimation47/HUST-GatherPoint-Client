@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import {type UserLoginRequestModel } from '../../Models/API_Requests/API_Request_Models'
+import {API_URL} from '../../Models/API_Requests/API_Request_URLs'
 import {APIErrorCode, CommonSuccessCode} from '../../Models/Common/ErrorCodes'
 import {type UserLoginResponseModel} from '../../Models/API_Responses/API_Response_Models'
 import {LStorage} from '../../configurations/localStorage_Keys'
+import {CoreConfiguration} from '../../configurations/coreConfig'
+import {ReqHelper} from '../../helpers/RequestsHelper'
 
 import { useRouter } from 'vue-router';
 import { RLinks } from '@/configurations/routerLinks';
@@ -14,7 +17,7 @@ const titleText = ref("Login?")
 const username_placeholder = ref("Enter username")
 const password_placeholder = ref("Enter password")
 
-const input_username =  ref(localStorage.getItem(LStorage.lastEntered_username) ?? "")
+const input_username =  ref(localStorage.getItem(LStorage.last_entered_username) ?? "")
 
 const input_password = ref("")
 
@@ -47,7 +50,7 @@ const LoginBtnClicked = async() => {
         return
     }
     try{
-        localStorage.setItem("lastEntered_username", input_username.value)
+        localStorage.setItem(LStorage.last_entered_username, input_username.value)
         titleText.value = "Trying to Login..." 
         
         await delay(1000) //Fake loading time
@@ -56,11 +59,12 @@ const LoginBtnClicked = async() => {
             username: input_username.value,
             password: input_password.value,
         }
-        const login_response = await SendPostRequest("http://localhost:8000/user-login", req_body) as UserLoginResponseModel
+        const login_response = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserLogin}`, req_body) as UserLoginResponseModel
         
-        if (+login_response.code == CommonSuccessCode.APIRequestSuccess)
+        if (+login_response.code == CommonSuccessCode.APIRequestSuccess && login_response.authToken)
         {
             titleText.value = "Login success" 
+            localStorage.setItem(LStorage.last_auth_token, login_response.authToken)
             router.push(RLinks.Home)
             //Move to main screen
         }else if (+login_response.code == APIErrorCode.UserLoginRequest_UsernameOrPasswordIsIncorrect)
@@ -74,6 +78,9 @@ const LoginBtnClicked = async() => {
                 input_username_anim_class.value = ""
                 input_password_anim_class.value = ""
             })
+        }else
+        {
+            //TODO
         }
         
         
@@ -93,18 +100,23 @@ const SkipBtnClicked = () => {
     titleText.value = "Skipping..." 
 }
 
-const SendPostRequest = async (request_url:string ,body:any) => {
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin':'*', 'Access-Control-Allow-Methods':'POST,PATCH,OPTIONS'},
-        body: JSON.stringify(body)
-    };
-    const response = await fetch(request_url, requestOptions)
-    const data = response.json()
-    return data
-        // .then(response => response.json())
-        // .then(data => console.log(data));
-}
+// const SendPostRequest = async (request_url:string ,body:any) => {
+//     const requestOptions = {
+//         method: 'POST',
+//         headers: { 
+//             'Content-Type': 'application/json', 
+//             'Access-Control-Allow-Origin':'*', 
+//             'Access-Control-Allow-Methods':'POST,PATCH,OPTIONS',
+//             'AuthToken' : localStorage.getItem(LStorage.last_auth_token) ?? ""
+//         },
+//         body: JSON.stringify(body)
+//     };
+//     const response = await fetch(request_url, requestOptions)
+//     const data = response.json()
+//     return data
+//         // .then(response => response.json())
+//         // .then(data => console.log(data));
+// }
 </script>
 
 <template>
