@@ -13,6 +13,7 @@
   "dependencies": {
     "@capacitor/android": "^6.1.2",
     "@capacitor/core": "^6.1.2",
+    "@capacitor/geolocation": "^6.0.1",
     "@capacitor/ios": "^6.1.2",
     "@types/googlemaps": "^3.39.12",
     "@vueuse/core": "^11.1.0",

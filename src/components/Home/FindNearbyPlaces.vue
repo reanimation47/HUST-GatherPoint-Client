@@ -3,6 +3,10 @@ import { computed, ref, type Ref } from 'vue';
 import axios from 'axios'
 import { GoogleMap, AdvancedMarker, MarkerCluster } from 'vue3-google-map'
 
+//Native API for mobile
+import { Geolocation } from '@capacitor/geolocation';
+import { Capacitor } from '@capacitor/core';
+
 interface LocationResponseModel
 {
     place_id: string
@@ -46,6 +50,7 @@ const pinOptions = { background: '#92140C', borderColor: "#5B3000", scale:2 }
 let coordinates_map: any[] = []
 function locatorButtonPressed() {
     console.log("locatorButtonPressed")
+    console.log(`Is native?: ${Capacitor.isNativePlatform()}`)
     navigator.geolocation.getCurrentPosition(
       position => {
         lat.value = position.coords.latitude;
@@ -120,8 +125,8 @@ function addLocationsToGoogleMaps()
 </script>
 
 <template>
-    <div class="ui grid">
-        <div class="six wide column">
+    <div class="flex flex-col">
+        <div class="">
             <form class="ui segment large form">
             <div class="ui segment">
                 <div class="field">
@@ -148,28 +153,17 @@ function addLocationsToGoogleMaps()
                     </div>
                 </div>
                 </div>
-                <button type="button" class="ui button" @click="findCloseBuyButtonPressed">Find CloseBuy</button>
+                <button type="button" class="ui button" @click="findCloseBuyButtonPressed">Find nearby locations</button>
             </div>
             </form>
             
-            <div class="ui segment"  style="max-height:500px;overflow:scroll">
-                <div class="ui divided items">
-                    <div class="item" v-for="place in places" :key="place.place_id">
-                        <div class="content">
-                            <div class="header">{{place.name}}</div>
-                            <div class="meta">{{place.vicinity}}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
 
 
         </div>
 
 
 
-        <div  class="ten wide column segment ui" ref="map">
+        <div  class="" ref="map">
 
             <GoogleMap
                 v-if="mapDataIsReady"
@@ -198,6 +192,17 @@ function addLocationsToGoogleMaps()
             /> -->
 
 
+        </div>
+
+        <div class="ui segment"  style="max-height:500px;overflow:scroll">
+            <div class="ui divided items">
+                <div class="item" v-for="place in places" :key="place.place_id">
+                    <div class="content">
+                        <div class="header">{{place.name}}</div>
+                        <div class="meta">{{place.vicinity}}</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
