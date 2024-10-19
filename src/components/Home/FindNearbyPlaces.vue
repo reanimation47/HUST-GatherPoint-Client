@@ -4,8 +4,12 @@ import axios from 'axios'
 import { GoogleMap, AdvancedMarker, MarkerCluster } from 'vue3-google-map'
 
 //Native API for mobile
-import { Geolocation } from '@capacitor/geolocation';
+// import { Geolocation } from '@capacitor/geolocation';
 import { Capacitor } from '@capacitor/core';
+
+const delay = async (ms: number) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 interface LocationResponseModel
 {
@@ -25,17 +29,28 @@ interface LocationResponseModel
     user_ratings_total: number
     vicinity: string
 }
+enum mapState 
+{
+    NotReady = 0,
+    Processing = 1,
+    Ready = 2
+}
 
+//States
+let mapStateMachine = ref(mapState.NotReady)
+let mapDataIsReady = computed(() => mapStateMachine.value == mapState.Ready) 
+
+const btn_text = ref("Find nearby locations")
+
+
+//input
 const type = ref("")
-const radius = ref(1)
+const radius = ref(0)
+
+//locations info
 const lat = ref(0)
 const lng = ref(0)
 const places = ref([])  as Ref<LocationResponseModel[], LocationResponseModel[]>
-// let map: google.maps.Map = ref()
-// const coordinates = computed(() => {
-//     return `${lat}, ${lng}`
-// })
-let mapDataIsReady = ref(false) 
 const maps_api_secret = import.meta.env.VITE_APP_MAPS_API_SECRET
 if( !maps_api_secret)
 {
@@ -48,15 +63,42 @@ let markerOptions = { position: center, title: 'AAAAAAAAAAA' }
 const pinOptions = { background: '#92140C', borderColor: "#5B3000", scale:2 }
 
 let coordinates_map: any[] = []
-function locatorButtonPressed() {
-    console.log("locatorButtonPressed")
+
+function findNearbyButtonPressed() {
+    if (mapStateMachine.value == mapState.Processing)
+    {
+        btn_text.value = "Just wait mate.."
+        return
+    }
+    
+    if (!type.value || radius.value == 0)
+    {
+        btn_text.value = "Please choose Location Type and Search Range first."
+        delay(2000).then(() => {
+            btn_text.value = "Find nearby locations"
+        })
+        return
+    }
+    
+    console.log("mapState.Processing")
+    mapStateMachine.value = mapState.Processing
+    btn_text.value = "Processing.. please wait"
+    processCurrentLocation()
+}
+
+function processCurrentLocation() {
+    console.log("processCurrentLocation")
     console.log(`Is native?: ${Capacitor.isNativePlatform()}`)
+
+
     navigator.geolocation.getCurrentPosition(
       position => {
         lat.value = position.coords.latitude;
         lng.value = position.coords.longitude;
         console.log(`${lat.value}, ${lng.value}`)
         coordinates.value = `${lat.value}, ${lng.value}` 
+
+        getLocationsInfo()
       },
       error => {
         console.log("Error getting location");
@@ -64,7 +106,10 @@ function locatorButtonPressed() {
     );
   }
 
-function findCloseBuyButtonPressed() {
+
+function getLocationsInfo()
+{
+    console.log("getLocationsInfo")
 	const URL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
         lat.value
       },${lng.value}&type=${type.value}&radius=${radius.value *
@@ -74,12 +119,15 @@ function findCloseBuyButtonPressed() {
 		places.value = response.data.results;
         buildLocationMappings(response.data.results)
 		// addLocationsToGoogleMaps();
-    console.log(coordinates_map)
 
-        mapDataIsReady.value = true
+        console.log("mapState.Ready")
+        // mapDataIsReady.value = true
+        mapStateMachine.value = mapState.Ready
+        btn_text.value = "Find nearby locations (again?)"
 	}).catch(error => {
 		console.log(error.message);
 	});
+
 }
 
 function buildLocationMappings(results:any)
@@ -101,8 +149,8 @@ function buildLocationMappings(results:any)
         position: center,
         title: "TEST"
     }
+    console.log("buildLocationMappings finish")
 
-    console.log(coordinates_map)
 
 }
 
@@ -130,21 +178,23 @@ function addLocationsToGoogleMaps()
             <form class="ui segment large form">
             <div class="ui segment">
                 <div class="field">
-                <div class="ui right icon input large">
+                <!-- <div class="ui right icon input large">
                     <input type="text" :placeholder="coordinates" v-model="coordinates" />
                     <i class="dot circle link icon" @click="locatorButtonPressed"></i>
-                </div>
+                </div> -->
                 </div>
                 <div class="field">
                 <div class="two fields">
                     <div class="field">
                     <select v-model="type">
+                        <option value="" disabled selected >Location Type</option>
                         <option value="restaurant">restaurant</option>
                         <option value="cafe">cafe</option>
                     </select>
                     </div>
                     <div class="field">
                     <select v-model="radius">
+                        <option value="0" disabled selected >Search Range</option>
                         <option value="5">5 KM</option>
                         <option value="10">10 KM</option>
                         <option value="15">15 KM</option>
@@ -153,7 +203,7 @@ function addLocationsToGoogleMaps()
                     </div>
                 </div>
                 </div>
-                <button type="button" class="ui button" @click="findCloseBuyButtonPressed">Find nearby locations</button>
+                <button type="button" class="ui button" @click="findNearbyButtonPressed"> {{ btn_text }}</button>
             </div>
             </form>
             
@@ -194,7 +244,7 @@ function addLocationsToGoogleMaps()
 
         </div>
 
-        <div class="ui segment"  style="max-height:500px;overflow:scroll">
+        <div v-if="mapDataIsReady" class="ui segment"  style="max-height:500px;overflow:scroll">
             <div class="ui divided items">
                 <div class="item" v-for="place in places" :key="place.place_id">
                     <div class="content">
