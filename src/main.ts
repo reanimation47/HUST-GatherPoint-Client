@@ -4,6 +4,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import Login from './components/Authenticate/Login.vue'
 import Home from './components/Home/Home.vue'
+import FindNearbyPlaces from './components/Home/FindNearbyPlaces.vue'
 import { RLinks } from './configurations/routerLinks'
 
 import { createMemoryHistory, createWebHistory, createRouter } from 'vue-router'
@@ -12,6 +13,7 @@ const routes = [
   { path: RLinks.Default , redirect: {name: "login"}},
   
   { path: RLinks.Home, name: "home",  component: Home},
+  { path: RLinks.FindNearbyPlace , name: "find-nearby",  component: FindNearbyPlaces},
 ]
 
 const router = createRouter({

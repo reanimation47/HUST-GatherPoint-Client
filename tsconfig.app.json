@@ -3,6 +3,7 @@
   "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "src/Models/API_Requests/API_Request_Models.ts", "src/**/**/*.ts", "src/configurations/localStorage_Keys.ts"],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
+    // "types": ["node"],
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
 

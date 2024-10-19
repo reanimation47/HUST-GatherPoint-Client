@@ -15,7 +15,7 @@ let router = useRouter()
 
 const el = ref<HTMLElement | null>(null)
 const scrollingLocked = useScrollLock(el)
-scrollingLocked.value = true
+scrollingLocked.value = false 
 
 const titleText = ref("Login?")
 // const username_placeholder = ref("Enter username????")
@@ -70,7 +70,7 @@ const LoginBtnClicked = async() => {
         {
             titleText.value = "Login success" 
             localStorage.setItem(LStorage.last_auth_token, login_response.authToken)
-            router.push(RLinks.Home)
+            router.push(RLinks.FindNearbyPlace)
             //Move to main screen
         }else if (+login_response.code == APIErrorCode.UserLoginRequest_UsernameOrPasswordIsIncorrect)
         {
@@ -101,8 +101,10 @@ const RegisterBtnClicked = () => {
     titleText.value = "Trying to register..." 
 }
 
-const SkipBtnClicked = () => {
+const SkipBtnClicked = async () => {
     titleText.value = "Skipping..." 
+    await delay(1000) // Fake loading time
+    router.push(RLinks.FindNearbyPlace)
 }
 
 // const SendPostRequest = async (request_url:string ,body:any) => {
