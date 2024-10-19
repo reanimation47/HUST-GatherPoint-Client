@@ -7,10 +7,15 @@ import {type UserLoginResponseModel} from '../../Models/API_Responses/API_Respon
 import {LStorage} from '../../configurations/localStorage_Keys'
 import {CoreConfiguration} from '../../configurations/coreConfig'
 import {ReqHelper} from '../../helpers/RequestsHelper'
+import { useScrollLock } from '@vueuse/core'
 
 import { useRouter } from 'vue-router';
 import { RLinks } from '@/configurations/routerLinks';
 let router = useRouter()
+
+const el = ref<HTMLElement | null>(null)
+const scrollingLocked = useScrollLock(el)
+scrollingLocked.value = true
 
 const titleText = ref("Login?")
 // const username_placeholder = ref("Enter username????")
@@ -131,7 +136,7 @@ const SkipBtnClicked = () => {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
     <!--Stylesheet-->
 </head>
-<body>
+<body ref="el">
     <div class="background">
         <div class="shape"></div>
         <div class="shape"></div>
