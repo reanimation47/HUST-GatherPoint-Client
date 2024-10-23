@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import {type UserLoginRequestModel } from '../../Models/API_Requests/API_Request_Models'
+import {type UserLoginRequestModel, type UserRegisterRequestModel } from '../../Models/API_Requests/API_Request_Models'
 import {API_URL} from '../../Models/API_Requests/API_Request_URLs'
 import {APIErrorCode, CommonSuccessCode} from '../../Models/Common/ErrorCodes'
 import {type UserLoginResponseModel} from '../../Models/API_Responses/API_Response_Models'
@@ -36,24 +36,7 @@ const delay = async (ms: number) => {
 }
 
 const LoginBtnClicked = async() => {
-    if (input_username.value === '')
-    {
-        username_placeholder.value = "Username CANNOT be empty!"
-        input_username_anim_class.value = input_anim_class
-        delay(1500).then(() => {
-            input_username_anim_class.value = ""
-        })
-        return
-    }
-    if (input_password.value === '')
-    {
-        password_placeholder.value = "Password CANNOT be empty!"
-        input_password_anim_class.value = input_anim_class
-        delay(1500).then(() => {
-            input_password_anim_class.value = ""
-        })
-        return
-    }
+    if (!InputsAreValid()) {return}
     try{
         localStorage.setItem(LStorage.last_entered_username, input_username.value)
         titleText.value = "Trying to Login..." 
@@ -97,8 +80,60 @@ const LoginBtnClicked = async() => {
 }
 
 
-const RegisterBtnClicked = () => {
-    titleText.value = "Trying to register..." 
+const RegisterBtnClicked = async () => {
+    if (!InputsAreValid()) {return}
+    try{
+        // localStorage.setItem(LStorage.last_entered_username, input_username.value)
+        titleText.value = "Trying to register..." 
+        
+        await delay(1000) //Fake loading time
+        
+        const req_body: UserRegisterRequestModel = {
+            username: input_username.value,
+            password: input_password.value,
+        }
+        const register_response = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserRegister}`, req_body) as UserLoginResponseModel
+        
+        if (+register_response.code == CommonSuccessCode.APIRequestSuccess)
+        {
+            titleText.value = "Register success, please login" 
+            input_password.value = ""
+        }
+        else if (+register_response.code == APIErrorCode.UserRegisterRequest_UserAlreadyExist)
+        {
+            titleText.value = "Register failed" 
+            password_placeholder.value = ""
+            username_placeholder.value = "Username already exists"
+            input_password.value = ""
+            input_username.value = ""
+            input_username_anim_class.value = input_anim_class
+            input_password_anim_class.value = input_anim_class
+            delay(1500).then(() => {
+                input_username_anim_class.value = ""
+                input_password_anim_class.value = ""
+            })
+        }
+        else
+        {
+            titleText.value = "Register failed, please try again" 
+            password_placeholder.value = ""
+            // username_placeholder.value = "Username already exists"
+            input_password.value = ""
+            input_username_anim_class.value = input_anim_class
+            input_password_anim_class.value = input_anim_class
+            delay(1500).then(() => {
+                input_username_anim_class.value = ""
+                input_password_anim_class.value = ""
+            })
+            //TODO
+        }
+        
+        
+        
+    }catch(e)
+    {
+        console.log(e)
+    }
 }
 
 const SkipBtnClicked = async () => {
@@ -124,6 +159,29 @@ const SkipBtnClicked = async () => {
 //         // .then(response => response.json())
 //         // .then(data => console.log(data));
 // }
+
+const InputsAreValid = (): boolean => {
+    if (input_username.value === '')
+    {
+        username_placeholder.value = "Username CANNOT be empty!"
+        input_username_anim_class.value = input_anim_class
+        delay(1500).then(() => {
+            input_username_anim_class.value = ""
+        })
+        return false
+    }
+    if (input_password.value === '')
+    {
+        password_placeholder.value = "Password CANNOT be empty!"
+        input_password_anim_class.value = input_anim_class
+        delay(1500).then(() => {
+            input_password_anim_class.value = ""
+        })
+        return false
+    }
+
+    return true
+}
 </script>
 
 <template>

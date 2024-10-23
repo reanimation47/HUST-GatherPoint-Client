@@ -93,6 +93,7 @@ function processCurrentLocation() {
 
     navigator.geolocation.getCurrentPosition(
       position => {
+        console.log("Got the location")
         lat.value = position.coords.latitude;
         lng.value = position.coords.longitude;
         console.log(`${lat.value}, ${lng.value}`)
@@ -102,6 +103,7 @@ function processCurrentLocation() {
       },
       error => {
         console.log("Error getting location");
+        console.log(error);
       }
     );
   }
@@ -110,10 +112,14 @@ function processCurrentLocation() {
 function getLocationsInfo()
 {
     console.log("getLocationsInfo")
-	const URL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
+    const cors_everywhere_url = "https://cors-anywhere.herokuapp.com/"
+    let url_prefix = Capacitor.isNativePlatform() ? "" : cors_everywhere_url
+	const URL = `${url_prefix }https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
         lat.value
       },${lng.value}&type=${type.value}&radius=${radius.value *
         1000}&key=${maps_api_secret}`;
+
+    console.log(`VUE send ${URL}`)
 	axios.get(URL).then(response => {
         console.log(response.data.results)
 		places.value = response.data.results;
@@ -125,7 +131,10 @@ function getLocationsInfo()
         mapStateMachine.value = mapState.Ready
         btn_text.value = "Find nearby locations (again?)"
 	}).catch(error => {
-		console.log(error.message);
+        mapStateMachine.value = mapState.NotReady
+        btn_text.value = "Failed. Find nearby locations (again?)"
+		console.log(`VUE error: ${error}`);
+		console.log(`VUE error: ${error.message}`);
 	});
 
 }
