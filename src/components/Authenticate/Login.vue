@@ -20,7 +20,7 @@ scrollingLocked.value = false
 const titleText = ref("Login?")
 // const username_placeholder = ref("Enter username????")
 const username_placeholder = ref("Enter username")
-const password_placeholder = ref("Enter password")
+const password_placeholder = ref("password")
 
 const input_username =  ref(localStorage.getItem(LStorage.last_entered_username) ?? "")
 
@@ -196,27 +196,43 @@ const InputsAreValid = (): boolean => {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
     <!--Stylesheet-->
 </head>
-<body ref="el">
-    <div class="background">
-        <div class="shape"></div>
-        <div class="shape"></div>
-    </div>
-    <form>
-        <h3>{{ titleText }}</h3>
+<body class="bg-stone-950 grid grid-cols-1 h-screen w-screen place-content-center" >
 
-        <label for="username">Username</label>
-        <input :class="input_username_anim_class" type="text" :placeholder="username_placeholder" id="username" v-model="input_username">
 
-        <label for="password">Password</label>
-        <input :class="input_password_anim_class" type="password" :placeholder="password_placeholder" id="password" v-model="input_password">
+        <div class="m-12 grid grid-rows-5 gap-2 pt-5 pb-7 bg-stone-900">
 
-        <button type="button" class="transition ease-in-out delay-0 bg-white hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="LoginBtnClicked">Log In</button>
-        <!-- <button type="button" class="" @click="LoginBtnClicked">Log In</button> -->
-        <div class="social">
-          <div class="go" type="button" @click="RegisterBtnClicked" ><i></i>Register</div>
-          <div class="fb" @click="SkipBtnClicked"><i class=""></i>Skip</div>
+            <div class="min-h-10 rounded-lg shadow">
+                <h3 class="text-center text-3xl">{{ titleText }}</h3>
+            </div>
+
+            <div class="grid place-items-center mx-7 rounded-lg shadow">
+                <!-- <input :class="input_username_anim_class" type="text" :placeholder="username_placeholder" id="username" v-model="input_username"> -->
+                <input class="min-h-12 min-w-full p-2 text-xl bg-slate-800 rounded-lg text-start" type="text" :placeholder="username_placeholder" id="username" v-model="input_username">
+            </div>
+
+            <div class="grid place-items-center mx-7 rounded-lg shadow">
+                <!-- <input :class="input_password_anim_class" type="password" :placeholder="password_placeholder" id="password" v-model="input_password"> -->
+                <input class="min-h-12 min-w-full p-2 text-xl bg-slate-800 rounded-lg text-start" type="password" :placeholder="password_placeholder" id="password" v-model="input_password">
+            </div>
+
+            <div class="grid grid-cols-2 gap-5 mx-7 rounded-lg shadow">
+                <div class="grid bg-slate-600">
+                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="LoginBtnClicked">Log In</button>
+                </div>
+                <div class="grid bg-slate-600">
+                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="RegisterBtnClicked" ><i></i>Register</button>
+                </div>
+            </div>
+            <div class="grid mx-7">
+                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="SkipBtnClicked" ><i></i>Skip</button>
+            </div>
         </div>
-    </form>
+
+
+
+
+
+
 </body>
 </html>
 
@@ -226,128 +242,5 @@ const InputsAreValid = (): boolean => {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-*,
-*:before,
-*:after{
-padding: 0;
-margin: 0;
-box-sizing: border-box;
-}
-body{
-background-color: #080710;
-}
-.background{
-width: 430px;
-height: 520px;
-position: absolute;
-transform: translate(-50%,-50%);
-left: 50%;
-top: 50%;
-}
-.background .shape{
-height: 200px;
-width: 200px;
-position: absolute;
-border-radius: 50%;
-}
-.shape:first-child{
-background: linear-gradient(
-    #1845ad,
-    #23a2f6
-);
-left: -80px;
-top: -80px;
-}
-.shape:last-child{
-background: linear-gradient(
-    to right,
-    #ff512f,
-    #f09819
-);
-right: -30px;
-bottom: -80px;
-}
-form{
-height: 520px;
-width: 400px;
-background-color: rgba(255,255,255,0.13);
-position: absolute;
-transform: translate(-50%,-50%);
-top: 50%;
-left: 50%;
-border-radius: 10px;
-backdrop-filter: blur(10px);
-border: 2px solid rgba(255,255,255,0.1);
-box-shadow: 0 0 40px rgba(8,7,16,0.6);
-padding: 50px 35px;
-}
-form *{
-font-family: 'Poppins',sans-serif;
-color: #ffffff;
-letter-spacing: 0.5px;
-outline: none;
-border: none;
-}
-form h3{
-font-size: 32px;
-font-weight: 500;
-line-height: 42px;
-text-align: center;
-}
-
-label{
-display: block;
-margin-top: 30px;
-font-size: 16px; 
-font-weight: 500;
-}
-input{
-display: block;
-height: 50px;
-width: 100%;
-background-color: rgba(255,255,255,0.07);
-border-radius: 3px;
-padding: 0 10px;
-margin-top: 8px;
-font-size: 14px;
-font-weight: 300;
-}
-::placeholder{
-color: #e5e5e5;
-}
-button{
-margin-top: 50px;
-width: 100%;
-background-color: #ffffff;
-color: #080710;
-padding: 15px 0;
-font-size: 18px;
-font-weight: 600;
-border-radius: 5px;
-cursor: pointer;
-}
-.social{
-margin-top: 30px;
-display: flex;
-}
-.social div{
-background: red;
-width: 150px;
-border-radius: 3px;
-padding: 5px 10px 10px 5px;
-background-color: rgba(255,255,255,0.27);
-color: #eaf0fb;
-text-align: center;
-}
-.social div:hover{
-background-color: rgba(255,255,255,0.47);
-}
-.social .fb{
-margin-left: 25px;
-}
-.social i{
-margin-right: 4px;
-}
-
 
 </style>
