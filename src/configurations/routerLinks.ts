@@ -4,4 +4,5 @@ export class RLinks
     static Default= "/"
     
     static Home = "/home"
+    static FindNearbyPlace = "/main-find-nearbyplace"
 }

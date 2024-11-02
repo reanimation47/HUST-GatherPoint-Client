@@ -3,6 +3,7 @@ import { LStorage } from "@/configurations/localStorage_Keys";
 export class ReqHelper
 {
     static SendPostRequest = async (request_url:string ,body:any) => {
+        console.log(`VUE GP SEND ${request_url}`)
         const requestOptions = {
             method: 'POST',
             headers: { 
