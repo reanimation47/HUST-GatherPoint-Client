@@ -1,3 +1,4 @@
+//Made-up error codes
 export enum APIErrorCode
 {
     UserRegisterRequest_MissingUsernameOrPassword = 401,
@@ -7,6 +8,11 @@ export enum APIErrorCode
     UserLoginRequest_MissingUsernameOrPassword = 404,
     UserLoginRequest_UsernameOrPasswordIsIncorrect = 405,
     UserLoginRequest_CannotUpdateUserAuthToken = 406,
+}
+
+export enum NetworkErrorCode
+{
+    CannotReachBackendServer = 444
 }
 
 export enum CommonErrorCode

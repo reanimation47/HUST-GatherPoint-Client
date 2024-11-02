@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import {type UserLoginRequestModel, type UserRegisterRequestModel } from '../../Models/API_Requests/API_Request_Models'
 import {API_URL} from '../../Models/API_Requests/API_Request_URLs'
-import {APIErrorCode, CommonSuccessCode} from '../../Models/Common/ErrorCodes'
+import {APIErrorCode, CommonSuccessCode, NetworkErrorCode} from '../../Models/Common/ErrorCodes'
 import {type UserLoginResponseModel} from '../../Models/API_Responses/API_Response_Models'
 import {LStorage} from '../../configurations/localStorage_Keys'
 import {CoreConfiguration} from '../../configurations/coreConfig'
@@ -73,9 +73,14 @@ const LoginBtnClicked = async() => {
         
         
         
-    }catch(e)
+    }catch(e:any)
     {
-        console.log(e)
+        if (e.code){
+            if (e.code = NetworkErrorCode.CannotReachBackendServer)
+            {
+                titleText.value = "Server is not reachable" 
+            }
+        }
     }
 }
 
@@ -130,9 +135,14 @@ const RegisterBtnClicked = async () => {
         
         
         
-    }catch(e)
+    }catch(e:any)
     {
-        console.log(e)
+        if (e.code){
+            if (e.code = NetworkErrorCode.CannotReachBackendServer)
+            {
+                titleText.value = "Server is not reachable" 
+            }
+        }
     }
 }
 
@@ -199,7 +209,7 @@ const InputsAreValid = (): boolean => {
 <body class="bg-stone-950 grid grid-cols-1 h-screen w-screen place-content-center" >
 
 
-        <div class="m-12 grid grid-rows-5 gap-2 pt-5 pb-7 bg-stone-900">
+        <div class="m-12 rounded-lg grid grid-rows-5 gap-2 pt-5 pb-7 bg-stone-900">
 
             <div class="min-h-10 rounded-lg shadow">
                 <h3 class="text-center text-3xl">{{ titleText }}</h3>
@@ -207,12 +217,12 @@ const InputsAreValid = (): boolean => {
 
             <div class="grid place-items-center mx-7 rounded-lg shadow">
                 <!-- <input :class="input_username_anim_class" type="text" :placeholder="username_placeholder" id="username" v-model="input_username"> -->
-                <input class="min-h-12 min-w-full p-2 text-xl bg-slate-800 rounded-lg text-start" type="text" :placeholder="username_placeholder" id="username" v-model="input_username">
+                <input :class="input_username_anim_class + 'min-h-12 min-w-full p-2 text-xl bg-slate-800 rounded-lg text-start'" type="text" :placeholder="username_placeholder" id="username" v-model="input_username">
             </div>
 
             <div class="grid place-items-center mx-7 rounded-lg shadow">
                 <!-- <input :class="input_password_anim_class" type="password" :placeholder="password_placeholder" id="password" v-model="input_password"> -->
-                <input class="min-h-12 min-w-full p-2 text-xl bg-slate-800 rounded-lg text-start" type="password" :placeholder="password_placeholder" id="password" v-model="input_password">
+                <input :class="input_password_anim_class+'min-h-12 min-w-full p-2 text-xl bg-slate-800 rounded-lg text-start'" type="password" :placeholder="password_placeholder" id="password" v-model="input_password">
             </div>
 
             <div class="grid grid-cols-2 gap-5 mx-7 rounded-lg shadow">

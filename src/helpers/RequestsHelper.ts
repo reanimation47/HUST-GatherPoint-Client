@@ -1,4 +1,5 @@
 import { LStorage } from "@/configurations/localStorage_Keys";
+import { NetworkErrorCode } from "@/Models/Common/ErrorCodes";
 
 export class ReqHelper
 {
@@ -14,8 +15,16 @@ export class ReqHelper
             },
             body: JSON.stringify(body)
         };
-        const response = await fetch(request_url, requestOptions)
-        const data = response.json()
-        return data
+        try{
+            const response = await fetch(request_url, requestOptions)
+            const data = response.json()
+            return data
+        }catch
+        {
+            throw {
+                message: "Cannot reach server",
+                code: NetworkErrorCode.CannotReachBackendServer
+            }
+        }
     }
 }
