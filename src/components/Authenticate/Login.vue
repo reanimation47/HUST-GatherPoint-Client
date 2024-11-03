@@ -217,20 +217,20 @@ const InputsAreValid = (): boolean => {
 
             <div class="grid place-items-center mx-7 rounded-lg shadow">
                 <!-- <input :class="input_username_anim_class" type="text" :placeholder="username_placeholder" id="username" v-model="input_username"> -->
-                <input :class="input_username_anim_class + 'min-h-12 min-w-full p-2 text-xl bg-slate-800 rounded-lg text-start'" type="text" :placeholder="username_placeholder" id="username" v-model="input_username">
+                <input :class="input_username_anim_class + 'min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start'" type="text" :placeholder="username_placeholder" id="username" v-model="input_username">
             </div>
 
             <div class="grid place-items-center mx-7 rounded-lg shadow">
                 <!-- <input :class="input_password_anim_class" type="password" :placeholder="password_placeholder" id="password" v-model="input_password"> -->
-                <input :class="input_password_anim_class+'min-h-12 min-w-full p-2 text-xl bg-slate-800 rounded-lg text-start'" type="password" :placeholder="password_placeholder" id="password" v-model="input_password">
+                <input :class="input_password_anim_class+'min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start'" type="password" :placeholder="password_placeholder" id="password" v-model="input_password">
             </div>
 
             <div class="grid grid-cols-2 gap-5 mx-7 rounded-lg shadow">
                 <div class="grid bg-slate-600">
-                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="LoginBtnClicked">Log In</button>
+                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-login-button-main-color hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="LoginBtnClicked">Log In</button>
                 </div>
                 <div class="grid bg-slate-600">
-                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="RegisterBtnClicked" ><i></i>Register</button>
+                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-login-button-main-color hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="RegisterBtnClicked" ><i></i>Register</button>
                 </div>
             </div>
             <div class="grid mx-7">

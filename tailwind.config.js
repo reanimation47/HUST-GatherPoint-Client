@@ -8,6 +8,10 @@ export default {
         },
         gridTemplateColumns: {
             '70/30': ' 70% 28%'
+        },
+        colors: {
+          'login-button-main-color': '#998650',
+          'login-button-skip-color': '#A7754D',
         }
         
     },
