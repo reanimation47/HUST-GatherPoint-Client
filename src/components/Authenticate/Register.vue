@@ -49,6 +49,7 @@ const RegisterBtnClicked = async () => {
         const req_body: UserRegisterRequestModel = {
             username: input_username.value,
             password: input_password.value,
+            address: input_address.value
         }
         const register_response = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserRegister}`, req_body) as UserLoginResponseModel
         

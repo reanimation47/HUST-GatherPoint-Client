@@ -8,4 +8,5 @@ export interface UserRegisterRequestModel
 {
     username: string,
     password: string
+    address: string
 }
