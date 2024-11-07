@@ -68,6 +68,9 @@ const RegisterBtnClicked = async () => {
             password: input_password.value,
             address: input_address.value
         }
+        //test
+        // await ReqHelper.GGMAP_Get_GeoLocation_By_Address(req_body.address)
+
         const register_response = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserRegister}`, req_body) as UserLoginResponseModel
         
         if (+register_response.code == CommonSuccessCode.APIRequestSuccess)
