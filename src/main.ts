@@ -1,6 +1,7 @@
 import './assets/main.css'
 
 import { createApp } from 'vue'
+import PrimeVue from 'primevue/config';
 import App from './App.vue'
 import Login from './components/Authenticate/Login.vue'
 import Register from './components/Authenticate/Register.vue'
@@ -24,4 +25,4 @@ const router = createRouter({
 })
 
 
-createApp(App).use(router).mount('#app')
+createApp(App).use(router).use(PrimeVue).mount('#app')

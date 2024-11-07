@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, type Ref } from 'vue';
 import {type UserLoginRequestModel, type UserRegisterRequestModel } from '../../Models/API_Requests/API_Request_Models'
 import {API_URL} from '../../Models/API_Requests/API_Request_URLs'
 import {APIErrorCode, CommonSuccessCode, NetworkErrorCode} from '../../Models/Common/ErrorCodes'
@@ -7,11 +7,19 @@ import {type UserLoginResponseModel} from '../../Models/API_Responses/API_Respon
 import {LStorage} from '../../configurations/localStorage_Keys'
 import {CoreConfiguration} from '../../configurations/coreConfig'
 import {ReqHelper} from '../../helpers/RequestsHelper'
+import axios from 'axios'
 import { useScrollLock } from '@vueuse/core'
+
+import AutoComplete from 'primevue/autocomplete';
+
 
 import { useRouter } from 'vue-router';
 import { RLinks } from '@/configurations/routerLinks';
+import { Capacitor } from '@capacitor/core';
 let router = useRouter()
+const maps_api_secret = import.meta.env.VITE_APP_MAPS_API_SECRET
+
+let addr_autocomplete_minlength = 4
 
 const el = ref<HTMLElement | null>(null)
 const scrollingLocked = useScrollLock(el)
@@ -35,6 +43,34 @@ const input_anim_class = "animate-shake animate-once"
 
 const delay = async (ms: number) => {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+let addresses_suggest_Items: Ref<string[], string[]> = ref([])
+const addressAutoComplete = (event:any) => {
+    // if (true) {return}
+    if (input_address.value == "") {return}
+    if (event.query.length < addr_autocomplete_minlength) {return}
+    // testItems.value = [...Array(10).keys()].map((item) => event.query + '-' + item);
+    // console.log(testItems.value)
+    // console.log(testItems.value)
+    console.log(event.query)
+    const cors_everywhere_url = "https://cors-anywhere.herokuapp.com/"
+    let url_prefix = Capacitor.isNativePlatform() ? "" : cors_everywhere_url
+	const URL = `${url_prefix }https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input_address.value}&key=${maps_api_secret}`;
+
+    console.log(URL)
+	axios.get(URL).then(response => {
+        addresses_suggest_Items.value = []
+        console.log(response.data.predictions)
+        let list_suggestions = response.data.predictions as Array<any>
+        list_suggestions.forEach(item => {
+            console.log(item.structured_formatting.main_text)
+            addresses_suggest_Items.value.push(item.description)
+        })
+	}).catch(error => {
+		console.log(`VUE error: ${error}`);
+		console.log(`VUE error: ${error.message}`);
+	});
 }
 
 
@@ -188,7 +224,8 @@ const InputsAreValid = (): boolean => {
             </div>
 
             <div class="grid place-items-center mx-7 rounded-lg shadow">
-                <input :class="input_address_anim_class + 'min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start'" type="text" :placeholder="address_placeholder" id="address" v-model="input_address">
+                <!-- <input :class="input_address_anim_class + 'min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start'" type="text" :placeholder="address_placeholder" id="address" v-model="input_address"> -->
+                <AutoComplete class="min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start" v-model="input_address" id="register_addr" variant="filled" size="large" :suggestions="addresses_suggest_Items" @complete="addressAutoComplete" />
             </div>
 
             <div class="grid mx-7">
@@ -216,5 +253,18 @@ const InputsAreValid = (): boolean => {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* .p-autocomplete
+{
+    width: 100%;
+    height: 3rem;
+    border-radius: 0.5rem;
+} */
+ /* #register_addr
+ {
+    width: 100%;
+    height: 3rem;
+    border-radius: 0.5rem;
+ } */
 
 </style>
