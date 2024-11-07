@@ -17,17 +17,19 @@ const el = ref<HTMLElement | null>(null)
 const scrollingLocked = useScrollLock(el)
 scrollingLocked.value = false 
 
-const titleText = ref("Login?")
+const titleText = ref("Register")
 // const username_placeholder = ref("Enter username????")
-const username_placeholder = ref("Enter username")
+const username_placeholder = ref("username")
 const password_placeholder = ref("password")
+const address_placeholder = ref("address")
 
 const input_username =  ref(localStorage.getItem(LStorage.last_entered_username) ?? "")
-
 const input_password = ref("")
+const input_address = ref("")
 
 const input_username_anim_class = ref("")
 const input_password_anim_class = ref("")
+const input_address_anim_class = ref("")
 
 const input_anim_class = "animate-shake animate-once"
 
@@ -35,30 +37,45 @@ const delay = async (ms: number) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-const LoginBtnClicked = async() => {
+
+const RegisterBtnClicked = async () => {
     if (!InputsAreValid()) {return}
     try{
-        localStorage.setItem(LStorage.last_entered_username, input_username.value)
-        titleText.value = "Trying to Login..." 
+        // localStorage.setItem(LStorage.last_entered_username, input_username.value)
+        titleText.value = "Trying to register..." 
         
         await delay(1000) //Fake loading time
         
-        const req_body: UserLoginRequestModel = {
+        const req_body: UserRegisterRequestModel = {
             username: input_username.value,
             password: input_password.value,
         }
-        const login_response = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserLogin}`, req_body) as UserLoginResponseModel
+        const register_response = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserRegister}`, req_body) as UserLoginResponseModel
         
-        if (+login_response.code == CommonSuccessCode.APIRequestSuccess && login_response.authToken)
+        if (+register_response.code == CommonSuccessCode.APIRequestSuccess)
         {
-            titleText.value = "Login success" 
-            localStorage.setItem(LStorage.last_auth_token, login_response.authToken)
-            router.push(RLinks.FindNearbyPlace)
-            //Move to main screen
-        }else if (+login_response.code == APIErrorCode.UserLoginRequest_UsernameOrPasswordIsIncorrect)
+            titleText.value = "Register success, please login" 
+            input_password.value = ""
+        }
+        else if (+register_response.code == APIErrorCode.UserRegisterRequest_UserAlreadyExist)
         {
-            titleText.value = "Login failed" 
-            password_placeholder.value = "Username or Password is incorrect"
+            titleText.value = "Register failed" 
+            password_placeholder.value = ""
+            username_placeholder.value = "Username already exists"
+            input_password.value = ""
+            input_username.value = ""
+            input_username_anim_class.value = input_anim_class
+            input_password_anim_class.value = input_anim_class
+            delay(1500).then(() => {
+                input_username_anim_class.value = ""
+                input_password_anim_class.value = ""
+            })
+        }
+        else
+        {
+            titleText.value = "Register failed, please try again" 
+            password_placeholder.value = ""
+            // username_placeholder.value = "Username already exists"
             input_password.value = ""
             input_username_anim_class.value = input_anim_class
             input_password_anim_class.value = input_anim_class
@@ -66,8 +83,6 @@ const LoginBtnClicked = async() => {
                 input_username_anim_class.value = ""
                 input_password_anim_class.value = ""
             })
-        }else
-        {
             //TODO
         }
         
@@ -84,8 +99,9 @@ const LoginBtnClicked = async() => {
     }
 }
 
-const GoToRegisterPage = async () => {
-    router.push(RLinks.RegisterPage)
+
+const GoToLoginPage = async () => {
+    router.push(RLinks.LoginPage)
 }
 
 // const SendPostRequest = async (request_url:string ,body:any) => {
@@ -125,6 +141,15 @@ const InputsAreValid = (): boolean => {
         })
         return false
     }
+    if (input_address.value === '')
+    {
+        address_placeholder.value = "address CANNOT be empty!"
+        input_address_anim_class.value = input_anim_class
+        delay(1500).then(() => {
+            input_address_anim_class.value = ""
+        })
+        return false
+    }
 
     return true
 }
@@ -145,7 +170,7 @@ const InputsAreValid = (): boolean => {
 <body class="bg-stone-950 grid grid-cols-1 h-screen w-screen place-content-center" >
 
 
-        <div class="m-12 rounded-lg grid grid-rows-5 gap-2 pt-5 pb-7 bg-stone-900">
+        <div class="m-12 rounded-lg grid grid-rows-6 gap-2 pt-5 pb-7 bg-stone-900">
 
             <div class="min-h-10 rounded-lg shadow">
                 <h3 class="text-center text-3xl">{{ titleText }}</h3>
@@ -161,12 +186,17 @@ const InputsAreValid = (): boolean => {
                 <input :class="input_password_anim_class+'min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start'" type="password" :placeholder="password_placeholder" id="password" v-model="input_password">
             </div>
 
-            <div class="grid mx-7">
-                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="LoginBtnClicked" ><i></i>Login</button>
+            <div class="grid place-items-center mx-7 rounded-lg shadow">
+                <input :class="input_address_anim_class + 'min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start'" type="text" :placeholder="address_placeholder" id="address" v-model="input_address">
             </div>
+
+            <div class="grid mx-7">
+                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="RegisterBtnClicked" ><i></i>Register</button>
+            </div>
+
             <div class="grid grid-cols-1 gap-5 mx-7 rounded-lg shadow">
                 <div class="grid bg-slate-600">
-                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-login-button-main-color hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="GoToRegisterPage">Go to Register Page</button>
+                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-login-button-main-color hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="GoToLoginPage">Go To Login Page</button>
                 </div>
             </div>
         </div>
