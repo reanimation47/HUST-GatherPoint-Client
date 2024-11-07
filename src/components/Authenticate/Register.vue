@@ -46,31 +46,12 @@ const delay = async (ms: number) => {
 }
 
 let addresses_suggest_Items: Ref<string[], string[]> = ref([])
-const addressAutoComplete = (event:any) => {
+const addressAutoComplete = async (event:any) => {
     // if (true) {return}
     if (input_address.value == "") {return}
     if (event.query.length < addr_autocomplete_minlength) {return}
-    // testItems.value = [...Array(10).keys()].map((item) => event.query + '-' + item);
-    // console.log(testItems.value)
-    // console.log(testItems.value)
-    console.log(event.query)
-    const cors_everywhere_url = "https://cors-anywhere.herokuapp.com/"
-    let url_prefix = Capacitor.isNativePlatform() ? "" : cors_everywhere_url
-	const URL = `${url_prefix }https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input_address.value}&key=${maps_api_secret}`;
 
-    console.log(URL)
-	axios.get(URL).then(response => {
-        addresses_suggest_Items.value = []
-        console.log(response.data.predictions)
-        let list_suggestions = response.data.predictions as Array<any>
-        list_suggestions.forEach(item => {
-            console.log(item.structured_formatting.main_text)
-            addresses_suggest_Items.value.push(item.description)
-        })
-	}).catch(error => {
-		console.log(`VUE error: ${error}`);
-		console.log(`VUE error: ${error.message}`);
-	});
+    addresses_suggest_Items.value = (await ReqHelper.GGMAP_GetAutoComplete_Predictions(event.query)).map(item => item.description)
 }
 
 
