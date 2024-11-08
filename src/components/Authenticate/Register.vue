@@ -209,7 +209,7 @@ const InputsAreValid = (): boolean => {
 
             <div class="grid place-items-center mx-7 rounded-lg shadow">
                 <!-- <input :class="input_address_anim_class + 'min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start'" type="text" :placeholder="address_placeholder" id="address" v-model="input_address"> -->
-                <AutoComplete class="min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start" v-model="input_address" id="register_addr" variant="filled" size="large" :suggestions="addresses_suggest_Items" @complete="addressAutoComplete" />
+                <AutoComplete class="min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start" v-model="input_address" id="register_addr" variant="filled" :delay='1500' size="large" :suggestions="addresses_suggest_Items" @complete="addressAutoComplete" />
             </div>
 
             <div class="grid mx-7">
