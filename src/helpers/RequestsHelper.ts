@@ -1,4 +1,8 @@
+import { CoreConfiguration } from "@/configurations/coreConfig";
 import { LStorage } from "@/configurations/localStorage_Keys";
+import type { Get_AutoComplete_Predictions_Model } from "@/Models/API_Requests/API_Request_Models";
+import { API_URL } from "@/Models/API_Requests/API_Request_URLs";
+import type { Get_AutoComplete_Predictions_Response_Model } from "@/Models/API_Responses/API_Response_Models";
 import { NetworkErrorCode } from "@/Models/Common/ErrorCodes";
 import { Capacitor } from "@capacitor/core";
 import axios from 'axios'
@@ -20,7 +24,7 @@ export class ReqHelper
         try{
             const response = await fetch(request_url, requestOptions)
             const data = response.json()
-            return data
+            return Promise.resolve(data) 
         }catch
         {
             throw {
@@ -40,6 +44,15 @@ export class ReqHelper
         return import.meta.env.VITE_APP_MAPS_API_SECRET as string
     }
 
+    static GGMAP_GetAutoComplete_Predictions_FromServer = async (input:string): Promise<string[]> => {
+        console.log(input)
+        let req_body: Get_AutoComplete_Predictions_Model = {input: input}
+        let response = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Maps_GetAutoComplete_Predictions}`, req_body) as Get_AutoComplete_Predictions_Response_Model
+
+
+
+        return response.results
+    }
     static GGMAP_GetAutoComplete_Predictions = async (input:string) => {
         const URL = `${ReqHelper.URL_Cors_Prefix}https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&key=${ReqHelper.maps_api_key}`;
         try{

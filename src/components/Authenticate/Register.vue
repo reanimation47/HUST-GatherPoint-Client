@@ -51,7 +51,7 @@ const addressAutoComplete = async (event:any) => {
     if (input_address.value == "") {return}
     if (event.query.length < addr_autocomplete_minlength) {return}
 
-    addresses_suggest_Items.value = (await ReqHelper.GGMAP_GetAutoComplete_Predictions(event.query)).map(item => item.description)
+    addresses_suggest_Items.value = (await ReqHelper.GGMAP_GetAutoComplete_Predictions_FromServer(event.query))
 }
 
 

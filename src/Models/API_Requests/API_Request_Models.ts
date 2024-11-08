@@ -6,7 +6,12 @@ export interface UserLoginRequestModel
 
 export interface UserRegisterRequestModel
 {
-    username: string,
+    username: string
     password: string
     address: string
+}
+
+export interface Get_AutoComplete_Predictions_Model
+{
+    input: string
 }
