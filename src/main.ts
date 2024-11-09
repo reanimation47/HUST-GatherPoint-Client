@@ -7,6 +7,7 @@ import Login from './components/Authenticate/Login.vue'
 import Register from './components/Authenticate/Register.vue'
 import Home from './components/Home/Home.vue'
 import FindNearbyPlaces from './components/Home/FindNearbyPlaces.vue'
+import SocialsPage from './components/Social/SocialsPage.vue';
 import { RLinks } from './configurations/routerLinks'
 
 import { createMemoryHistory, createWebHistory, createRouter } from 'vue-router'
@@ -17,6 +18,8 @@ const routes = [
   
   { path: RLinks.Home, name: "home",  component: Home},
   { path: RLinks.FindNearbyPlace , name: "find-nearby",  component: FindNearbyPlaces},
+
+  { path: RLinks.SocialPage, name: "social-main",  component: SocialsPage},
 ]
 
 const router = createRouter({

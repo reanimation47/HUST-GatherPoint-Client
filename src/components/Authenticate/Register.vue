@@ -13,10 +13,11 @@ import { useScrollLock } from '@vueuse/core'
 import AutoComplete from 'primevue/autocomplete';
 
 
-import { useRouter } from 'vue-router';
 import { RLinks } from '@/configurations/routerLinks';
 import { Capacitor } from '@capacitor/core';
-let router = useRouter()
+import { RouterHelper } from '@/helpers/RouterHelper';
+let router = new RouterHelper()
+
 const maps_api_secret = import.meta.env.VITE_APP_MAPS_API_SECRET
 
 let addr_autocomplete_minlength = 4
@@ -122,7 +123,7 @@ const RegisterBtnClicked = async () => {
 
 
 const GoToLoginPage = async () => {
-    router.push(RLinks.LoginPage)
+    router.RouteToPage(RLinks.LoginPage)
 }
 
 // const SendPostRequest = async (request_url:string ,body:any) => {

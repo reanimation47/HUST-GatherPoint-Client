@@ -6,4 +6,6 @@ export class RLinks
     
     static Home = "/home"
     static FindNearbyPlace = "/main-find-nearbyplace"
+
+    static SocialPage = "/social-main"
 }

@@ -16,8 +16,7 @@ import AutoComplete from 'primevue/autocomplete';
 import { useRouter } from 'vue-router';
 import { RLinks } from '@/configurations/routerLinks';
 import { Capacitor } from '@capacitor/core';
-import { RouterHelper } from '@/helpers/RouterHelper';
-let router = new RouterHelper()
+let router = useRouter()
 
 
 const titleText = ref("Logged in as")
@@ -32,35 +31,18 @@ const delay = async (ms: number) => {
 }
 
 
-const GoToFindPlacesPage = () => {
+const GoToAddFriendsPage = () => {
     //TODO
 }
-const GoToSocialPage = () => {
-    router.RouteToPage(RLinks.SocialPage)
+const GoToFriendsListPage = () => {
+    //TODO
 }
 
 const Logout= () => {
     //TODO: clear credentials before going back to login back
-    router.RouteToPage(RLinks.LoginPage)
+    router.push(RLinks.Home)
 }
 
-// const SendPostRequest = async (request_url:string ,body:any) => {
-//     const requestOptions = {
-//         method: 'POST',
-//         headers: { 
-//             'Content-Type': 'application/json', 
-//             'Access-Control-Allow-Origin':'*', 
-//             'Access-Control-Allow-Methods':'POST,PATCH,OPTIONS',
-//             'AuthToken' : localStorage.getItem(LStorage.last_auth_token) ?? ""
-//         },
-//         body: JSON.stringify(body)
-//     };
-//     const response = await fetch(request_url, requestOptions)
-//     const data = response.json()
-//     return data
-//         // .then(response => response.json())
-//         // .then(data => console.log(data));
-// }
 </script>
 
 <template>
@@ -89,16 +71,16 @@ const Logout= () => {
 
 
             <div class="grid mx-7">
-                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToFindPlacesPage" ><i></i>Find Places</button>
+                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToAddFriendsPage" ><i></i>Add Friends</button>
             </div>
 
             <div class="grid mx-7">
-                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToSocialPage" ><i></i>Socials</button>
+                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToFriendsListPage" ><i></i>Friends list</button>
             </div>
 
             <div class="grid grid-cols-1 gap-5 mx-7 rounded-lg shadow">
                 <div class="grid bg-slate-600">
-                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-login-button-main-color hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="Logout">Log out</button>
+                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-login-button-main-color hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="Logout">Go back</button>
                 </div>
             </div>
         </div>

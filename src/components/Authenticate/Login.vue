@@ -9,9 +9,9 @@ import {CoreConfiguration} from '../../configurations/coreConfig'
 import {ReqHelper} from '../../helpers/RequestsHelper'
 import { useScrollLock } from '@vueuse/core'
 
-import { useRouter } from 'vue-router';
 import { RLinks } from '@/configurations/routerLinks';
-let router = useRouter()
+import { RouterHelper } from '@/helpers/RouterHelper';
+let router = new RouterHelper()
 
 const el = ref<HTMLElement | null>(null)
 const scrollingLocked = useScrollLock(el)
@@ -53,7 +53,7 @@ const LoginBtnClicked = async() => {
         {
             titleText.value = "Login success" 
             localStorage.setItem(LStorage.last_auth_token, login_response.authToken)
-            router.push(RLinks.FindNearbyPlace)
+            router.RouteToPage(RLinks.Home)
             //Move to main screen
         }else if (+login_response.code == APIErrorCode.UserLoginRequest_UsernameOrPasswordIsIncorrect)
         {
@@ -85,7 +85,7 @@ const LoginBtnClicked = async() => {
 }
 
 const GoToRegisterPage = async () => {
-    router.push(RLinks.RegisterPage)
+    router.RouteToPage(RLinks.RegisterPage)
 }
 
 // const SendPostRequest = async (request_url:string ,body:any) => {
