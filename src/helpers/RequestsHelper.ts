@@ -3,13 +3,15 @@ import { LStorage } from "@/configurations/localStorage_Keys";
 import type { Get_AutoComplete_Predictions_Model } from "@/Models/API_Requests/API_Request_Models";
 import { API_URL } from "@/Models/API_Requests/API_Request_URLs";
 import type { Get_AutoComplete_Predictions_Response_Model } from "@/Models/API_Responses/API_Response_Models";
-import { NetworkErrorCode } from "@/Models/Common/ErrorCodes";
+import { CommonErrorCode, NetworkErrorCode } from "@/Models/Common/ErrorCodes";
 import { Capacitor } from "@capacitor/core";
 import axios from 'axios'
+import { RouterHelper } from "./RouterHelper";
+import { RLinks } from "@/configurations/routerLinks";
 
 export class ReqHelper
 {
-    static SendPostRequest = async (request_url:string ,body:any) => {
+    static SendPostRequest = async (request_url:string ,body:any, router: RouterHelper) => {
         console.log(`VUE GP SEND ${request_url}`)
         const requestOptions = {
             method: 'POST',
@@ -24,7 +26,12 @@ export class ReqHelper
         };
         try{
             const response = await fetch(request_url, requestOptions)
-            const data = response.json()
+            const data = await response.json()
+            if (data.code == CommonErrorCode.UserIsNotAuthenticated)
+            {
+                localStorage.removeItem(LStorage.last_auth_token)
+                router.RouteToPage(RLinks.LoginPage)
+            }
             return Promise.resolve(data) 
         }catch
         {
@@ -45,10 +52,10 @@ export class ReqHelper
         return import.meta.env.VITE_APP_MAPS_API_SECRET as string
     }
 
-    static GGMAP_GetAutoComplete_Predictions_FromServer = async (input:string): Promise<string[]> => {
+    static GGMAP_GetAutoComplete_Predictions_FromServer = async (input:string, router: RouterHelper): Promise<string[]> => {
         let req_body: Get_AutoComplete_Predictions_Model = {input: input}
         try{
-            let response = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Maps_GetAutoComplete_Predictions}`, req_body) as Get_AutoComplete_Predictions_Response_Model
+            let response = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Maps_GetAutoComplete_Predictions}`, req_body, router) as Get_AutoComplete_Predictions_Response_Model
             return Promise.resolve(response.results) 
         }catch{
             console.error("Can't get autocomplete prediction from server, returning an empty array")

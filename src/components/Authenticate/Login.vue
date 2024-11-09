@@ -47,7 +47,7 @@ const LoginBtnClicked = async() => {
             username: input_username.value,
             password: input_password.value,
         }
-        const login_response = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserLogin}`, req_body) as UserLoginResponseModel
+        const login_response = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserLogin}`, req_body, router) as UserLoginResponseModel
         
         if (+login_response.code == CommonSuccessCode.APIRequestSuccess && login_response.authToken)
         {
@@ -68,6 +68,8 @@ const LoginBtnClicked = async() => {
             })
         }else
         {
+            console.log("Hmm?")
+            console.log(login_response.message)
             //TODO
         }
         

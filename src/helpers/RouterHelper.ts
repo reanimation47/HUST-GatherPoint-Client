@@ -21,6 +21,10 @@ export class RouterHelper
                 return
             }
         }
+        if (pageURL == RLinks.LoginPage) //Clear crendentials if we have to go back to login page
+        {
+            localStorage.removeItem(LStorage.last_auth_token)
+        }
         this.router.push(pageURL)
     }
 }

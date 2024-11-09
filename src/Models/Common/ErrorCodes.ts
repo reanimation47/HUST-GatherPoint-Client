@@ -1,4 +1,3 @@
-//Made-up error codes
 export enum APIErrorCode
 {
     UserRegisterRequest_MissingUsernameOrPassword = 401,
@@ -19,6 +18,12 @@ export enum CommonErrorCode
 {
     CannotHashPassword = 410,
     ENV_DATABASE_URL_MISSING = 411,
+    
+    GoogleMapsApiFailed = 412,
+    
+    RequestedUserDoesNotExist = 413,
+    
+    UserIsNotAuthenticated = 414
 }
 
 export enum CommonSuccessCode

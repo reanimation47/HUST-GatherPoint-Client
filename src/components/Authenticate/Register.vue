@@ -52,7 +52,7 @@ const addressAutoComplete = async (event:any) => {
     if (input_address.value == "") {return}
     if (event.query.length < addr_autocomplete_minlength) {return}
 
-    addresses_suggest_Items.value = (await ReqHelper.GGMAP_GetAutoComplete_Predictions_FromServer(event.query))
+    addresses_suggest_Items.value = (await ReqHelper.GGMAP_GetAutoComplete_Predictions_FromServer(event.query, router))
 }
 
 
@@ -72,7 +72,7 @@ const RegisterBtnClicked = async () => {
         //test
         // await ReqHelper.GGMAP_Get_GeoLocation_By_Address(req_body.address)
 
-        const register_response = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserRegister}`, req_body) as UserLoginResponseModel
+        const register_response = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserRegister}`, req_body, router) as UserLoginResponseModel
         
         if (+register_response.code == CommonSuccessCode.APIRequestSuccess)
         {

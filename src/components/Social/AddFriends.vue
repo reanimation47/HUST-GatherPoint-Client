@@ -13,10 +13,11 @@ import { useScrollLock } from '@vueuse/core'
 import AutoComplete from 'primevue/autocomplete';
 
 
-import { useRouter } from 'vue-router';
 import { RLinks } from '@/configurations/routerLinks';
 import { Capacitor } from '@capacitor/core';
-let router = useRouter()
+import { RouterHelper } from '@/helpers/RouterHelper';
+let router = new RouterHelper()
+
 
 
 const titleText = ref("Logged in as")
@@ -38,12 +39,23 @@ const delay = async (ms: number) => {
 
 
 const ProcessAddFriend = async () => {
-    if (!InputsAreValid()) {return}
+    if (await InputsAreValid() == false) {return}
     const friend_username = input_username.value
     const request_body: Social_AddFriend_Request_Model = {
         username: friend_username
     }
-    await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_AddFriend}`, request_body)
+    const add_friend_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_AddFriend}`, request_body, router)
+    if (add_friend_result.code == CommonSuccessCode.APIRequestSuccess)
+    {
+        input_username.value = ""
+        username_placeholder.value = add_friend_result.message
+    }else
+    {
+        console.warn(add_friend_result.message)
+        input_username.value = ""
+        username_placeholder.value = add_friend_result.message
+        wiggleTextBox()
+    }
     //TODO
 }
 const GoToFriendsListPage = () => {
@@ -52,20 +64,25 @@ const GoToFriendsListPage = () => {
 
 const GoBack= () => {
     //TODO: clear credentials before going back to login back
-    router.push(RLinks.SocialPage)
+    router.RouteToPage(RLinks.SocialPage)
 }
 
-const InputsAreValid = (): boolean => {
+const InputsAreValid = async() => {
     if (input_username.value === '')
     {
-        input_username_anim_class.value = input_anim_class
-        delay(1500).then(() => {
-            input_username_anim_class.value = ""
-        })
+        await wiggleTextBox()
         return false
     }
     return true
 }
+
+const wiggleTextBox = async () => {
+        input_username_anim_class.value = input_anim_class
+        await delay(1500)
+        input_username_anim_class.value = ""
+        return Promise.resolve()
+}
+
 </script>
 
 <template>
