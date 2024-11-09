@@ -10,6 +10,6 @@ export class RouterHelper
 
     RouteToPage(pageURL:string, requiresAuth: boolean = false)
     {
-        this.router.push(RLinks.SocialPage)
+        this.router.push(pageURL)
     }
 }

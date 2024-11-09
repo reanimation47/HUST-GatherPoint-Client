@@ -39,7 +39,7 @@ const GoToSocialPage = () => {
     router.RouteToPage(RLinks.SocialPage)
 }
 
-const Logout= () => {
+const Logout = () => {
     //TODO: clear credentials before going back to login back
     router.RouteToPage(RLinks.LoginPage)
 }
