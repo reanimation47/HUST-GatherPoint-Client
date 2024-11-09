@@ -17,7 +17,8 @@ export class ReqHelper
                 'Content-Type': 'application/json', 
                 'Access-Control-Allow-Origin':'*', 
                 'Access-Control-Allow-Methods':'POST,PATCH,OPTIONS',
-                'AuthToken' : localStorage.getItem(LStorage.last_auth_token) ?? ""
+                'AuthToken' : localStorage.getItem(LStorage.last_auth_token) ?? "",
+                'RequestFromUser' : localStorage.getItem(LStorage.last_entered_username) ?? "",
             },
             body: JSON.stringify(body)
         };

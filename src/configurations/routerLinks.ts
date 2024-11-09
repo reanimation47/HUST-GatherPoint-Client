@@ -8,4 +8,5 @@ export class RLinks
     static FindNearbyPlace = "/main-find-nearbyplace"
 
     static SocialPage = "/social-main"
+    static AddFriends = "/social-add-friends"
 }

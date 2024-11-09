@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
-import {type UserLoginRequestModel, type UserRegisterRequestModel } from '../../Models/API_Requests/API_Request_Models'
+import {type Social_AddFriend_Request_Model, type UserLoginRequestModel, type UserRegisterRequestModel } from '../../Models/API_Requests/API_Request_Models'
 import {API_URL} from '../../Models/API_Requests/API_Request_URLs'
 import {APIErrorCode, CommonSuccessCode, NetworkErrorCode} from '../../Models/Common/ErrorCodes'
 import {type UserLoginResponseModel} from '../../Models/API_Responses/API_Response_Models'
@@ -13,14 +13,20 @@ import { useScrollLock } from '@vueuse/core'
 import AutoComplete from 'primevue/autocomplete';
 
 
+import { useRouter } from 'vue-router';
 import { RLinks } from '@/configurations/routerLinks';
 import { Capacitor } from '@capacitor/core';
-import { RouterHelper } from '@/helpers/RouterHelper';
-let router = new RouterHelper() 
+let router = useRouter()
 
 
 const titleText = ref("Logged in as")
 const user_id = ref(localStorage.getItem(LStorage.last_entered_username) ?? "unknown")
+
+const input_username =  ref("")
+const username_placeholder = ref("Enter friend's username")
+
+const input_username_anim_class = ref("")
+const input_anim_class = "animate-shake animate-once"
 // const username_placeholder = ref("Enter username????")
 
 
@@ -31,18 +37,35 @@ const delay = async (ms: number) => {
 }
 
 
-const GoToAddFriendsPage = () => {
-    router.RouteToPage(RLinks.AddFriends)
+const ProcessAddFriend = async () => {
+    if (!InputsAreValid()) {return}
+    const friend_username = input_username.value
+    const request_body: Social_AddFriend_Request_Model = {
+        username: friend_username
+    }
+    await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_AddFriend}`, request_body)
+    //TODO
 }
 const GoToFriendsListPage = () => {
     //TODO
 }
 
-const Logout= () => {
+const GoBack= () => {
     //TODO: clear credentials before going back to login back
-    router.RouteToPage(RLinks.Home)
+    router.push(RLinks.SocialPage)
 }
 
+const InputsAreValid = (): boolean => {
+    if (input_username.value === '')
+    {
+        input_username_anim_class.value = input_anim_class
+        delay(1500).then(() => {
+            input_username_anim_class.value = ""
+        })
+        return false
+    }
+    return true
+}
 </script>
 
 <template>
@@ -68,19 +91,19 @@ const Logout= () => {
             </div>
 
 
+            <div class="grid mx-7">
+                <input :class="input_username_anim_class + 'min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start'" type="text" :placeholder="username_placeholder" id="username" v-model="input_username">
+            </div>
 
 
             <div class="grid mx-7">
-                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToAddFriendsPage" ><i></i>Add Friends</button>
+                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="ProcessAddFriend" ><i></i>Add Friends</button>
             </div>
 
-            <div class="grid mx-7">
-                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToFriendsListPage" ><i></i>Friends list</button>
-            </div>
 
             <div class="grid grid-cols-1 gap-5 mx-7 rounded-lg shadow">
                 <div class="grid bg-slate-600">
-                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-login-button-main-color hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="Logout">Go back</button>
+                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-login-button-main-color hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="GoBack">Go back</button>
                 </div>
             </div>
         </div>
