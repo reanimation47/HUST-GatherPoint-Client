@@ -9,6 +9,7 @@ import {CoreConfiguration} from '../../configurations/coreConfig'
 import {ReqHelper} from '../../helpers/RequestsHelper'
 import axios from 'axios'
 import { useScrollLock } from '@vueuse/core'
+import InputPopup from '../Modals/InputPopup.vue';
 
 import AutoComplete from 'primevue/autocomplete';
 
@@ -25,6 +26,7 @@ const user_id = ref(sessionStorage.getItem(LStorage.last_entered_username) ?? "u
 // const username_placeholder = ref("Enter username????")
 
 
+const showPopup = ref(true)
 
 
 const delay = async (ms: number) => {
@@ -63,6 +65,9 @@ const Logout = () => {
 </script>
 
 <template>
+    <div class="">
+
+    </div>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -74,8 +79,17 @@ const Logout = () => {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
     <!--Stylesheet-->
 </head>
-<body class="bg-stone-950 grid grid-cols-1 h-screen w-screen place-content-center" >
+<body class="root bg-stone-950 grid grid-cols-1 h-screen w-screen place-content-center" >
 
+        <Teleport to="body" v-if="showPopup">
+            <div class="modal">
+                <input-popup
+                    title="Title"
+                    msg="Test"
+                />
+                
+            </div>
+        </Teleport>
 
         <div class="m-12 rounded-lg grid grid-rows-4 gap-2 pt-5 pb-7 bg-stone-900">
 
@@ -129,5 +143,20 @@ const Logout = () => {
     height: 3rem;
     border-radius: 0.5rem;
  } */
+
+ .root{
+    position: relative;
+ }
+
+ .modal{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+ }
 
 </style>

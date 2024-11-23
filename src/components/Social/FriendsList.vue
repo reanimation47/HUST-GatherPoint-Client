@@ -88,17 +88,19 @@ const FriendItemClicked = () => {
 
 
 
-            <div class="grid h-12 grid-cols-1 mt-3 mx-7 rounded-lg shadow">
-                <div class="grid bg-slate-600">
-                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-login-button-main-color hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="GoBack">Go back</button>
-                </div>
-            </div>
+
             <div>
                 <ul class="grid grid-flow-row grid-cols-1 gap-2 mt-4 mx-7">
                     <li class="" v-for="friend in list_friends" >
                         <button type="button" class="rounded-lg min-h-10 w-full transition ease-in-out delay-0 bg-friend-list-item hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="FriendItemClicked">{{ friend }}</button>
                     </li>
                 </ul>
+            </div>
+
+            <div class="grid h-12 grid-cols-1 mt-3 mx-7 rounded-lg shadow">
+                <div class="grid bg-slate-600">
+                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-login-button-main-color hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="GoBack">Go back</button>
+                </div>
             </div>
         </div>
 
