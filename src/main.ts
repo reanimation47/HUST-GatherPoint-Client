@@ -9,6 +9,7 @@ import Home from './components/Home/Home.vue'
 import FindNearbyPlaces from './components/Home/FindNearbyPlaces.vue'
 import SocialsPage from './components/Social/SocialsPage.vue';
 import AddFriends from './components/Social/AddFriends.vue';
+import FriendsList from './components/Social/FriendsList.vue';
 import { RLinks } from './configurations/routerLinks'
 
 import { createMemoryHistory, createWebHistory, createRouter } from 'vue-router'
@@ -20,8 +21,9 @@ const routes = [
   { path: RLinks.Home, name: "home",  component: Home},
   { path: RLinks.FindNearbyPlace , name: "find-nearby",  component: FindNearbyPlaces},
 
-  { path: RLinks.SocialPage, name: "social-main",  component: SocialsPage},
-  { path: RLinks.AddFriends, name: "social-add-friends",  component: AddFriends},
+  { path: RLinks.SocialPage, name: RLinks.SocialPage,  component: SocialsPage},
+  { path: RLinks.AddFriends, name: RLinks.AddFriends,  component: AddFriends},
+  { path: RLinks.FriendsList, name: RLinks.FriendsList,  component: FriendsList},
 ]
 
 const router = createRouter({

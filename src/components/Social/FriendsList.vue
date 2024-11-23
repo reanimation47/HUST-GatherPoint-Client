@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue';
+import { onBeforeMount, ref, type Ref } from 'vue';
 import {type UserLoginRequestModel, type UserRegisterRequestModel } from '../../Models/API_Requests/API_Request_Models'
 import {API_URL} from '../../Models/API_Requests/API_Request_URLs'
 import {APIErrorCode, CommonSuccessCode, NetworkErrorCode} from '../../Models/Common/ErrorCodes'
@@ -19,9 +19,29 @@ import { RouterHelper } from '@/helpers/RouterHelper';
 let router = new RouterHelper() 
 
 
-const titleText = ref("Logged in as")
-const user_id = ref(sessionStorage.getItem(LStorage.last_entered_username) ?? "unknown")
+const titleText = ref("Logged in as") //TODO: reminder to maybe unify this tittle into 1 module. As so many screens use this.
+const user_id = ref(sessionStorage.getItem(LStorage.last_entered_username) ?? "unknown") //TODO: should we even display unknown? Or just force user to log in again..
 // const username_placeholder = ref("Enter username????")
+
+const list_friends = ref([
+    "Friend 1",
+    "Friend 2",
+    "Friend 3",
+    "Friend 4",
+])
+
+onBeforeMount( async () => {
+    console.log("before?")
+    // Get the friend list from server
+    const get_friends_list_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_GetFriendsList}`, {}, router)
+    console.log(get_friends_list_result.code)
+    console.log(get_friends_list_result.result)
+    console.log(Array.isArray(get_friends_list_result.result))
+    if (Array.isArray(get_friends_list_result.result))
+    {
+        list_friends.value = get_friends_list_result.result
+    }
+})
 
 
 
@@ -31,16 +51,13 @@ const delay = async (ms: number) => {
 }
 
 
-const GoToAddFriendsPage = () => {
-    router.RouteToPage(RLinks.AddFriends)
-}
-const GoToFriendsListPage = () => {
-    router.RouteToPage(RLinks.FriendsList)
+
+const GoBack = () => {
+    router.RouteToPage(RLinks.SocialPage)
 }
 
-const Logout= () => {
-    //TODO: clear credentials before going back to login back
-    router.RouteToPage(RLinks.Home)
+const FriendItemClicked = () => {
+    //TODO
 }
 
 </script>
@@ -60,7 +77,7 @@ const Logout= () => {
 <body class="bg-stone-950 grid grid-cols-1 h-screen w-screen place-content-center" >
 
 
-        <div class="m-12 rounded-lg grid grid-rows-4 gap-2 pt-5 pb-7 bg-stone-900">
+        <div class="m-12 rounded-lg gap-2 pt-5 pb-7 bg-stone-900">
 
             <div class="min-h-10 rounded-lg shadow">
                 <h3 class="text-center text-xl">{{ titleText }}</h3>
@@ -70,20 +87,21 @@ const Logout= () => {
 
 
 
-            <div class="grid mx-7">
-                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToAddFriendsPage" ><i></i>Add Friends</button>
-            </div>
 
-            <div class="grid mx-7">
-                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToFriendsListPage" ><i></i>Friends list</button>
-            </div>
-
-            <div class="grid grid-cols-1 gap-5 mx-7 rounded-lg shadow">
+            <div class="grid h-12 grid-cols-1 mt-3 mx-7 rounded-lg shadow">
                 <div class="grid bg-slate-600">
-                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-login-button-main-color hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="Logout">Go back</button>
+                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-login-button-main-color hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="GoBack">Go back</button>
                 </div>
             </div>
+            <div>
+                <ul class="grid grid-flow-row grid-cols-1 gap-2 mt-4 mx-7">
+                    <li class="" v-for="friend in list_friends" >
+                        <button type="button" class="rounded-lg min-h-10 w-full transition ease-in-out delay-0 bg-friend-list-item hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="FriendItemClicked">{{ friend }}</button>
+                    </li>
+                </ul>
+            </div>
         </div>
+
 
 
 

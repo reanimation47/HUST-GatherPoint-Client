@@ -12,6 +12,7 @@ export default {
         colors: {
           'login-button-main-color': '#998650',
           'login-button-skip-color': '#A7754D',
+          'friend-list-item': '#8D9EC6',
         }
         
     },
