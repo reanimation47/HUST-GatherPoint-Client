@@ -13,7 +13,7 @@ export class RouterHelper
     {
         if (requiresAuth)
         {
-            const authToken = localStorage.getItem(LStorage.last_auth_token)
+            const authToken = sessionStorage.getItem(LStorage.last_auth_token)
             if (authToken == null)
             {
                 //TODO: alert user they need to re-login
@@ -23,7 +23,7 @@ export class RouterHelper
         }
         if (pageURL == RLinks.LoginPage) //Clear crendentials if we have to go back to login page
         {
-            localStorage.removeItem(LStorage.last_auth_token)
+            sessionStorage.removeItem(LStorage.last_auth_token)
         }
         this.router.push(pageURL)
     }

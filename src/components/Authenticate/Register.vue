@@ -32,7 +32,7 @@ const username_placeholder = ref("username")
 const password_placeholder = ref("password")
 const address_placeholder = ref("address")
 
-const input_username =  ref(localStorage.getItem(LStorage.last_entered_username) ?? "")
+const input_username =  ref(sessionStorage.getItem(LStorage.last_entered_username) ?? "")
 const input_password = ref("")
 const input_address = ref("")
 

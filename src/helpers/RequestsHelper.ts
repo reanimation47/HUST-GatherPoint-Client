@@ -19,8 +19,8 @@ export class ReqHelper
                 'Content-Type': 'application/json', 
                 'Access-Control-Allow-Origin':'*', 
                 'Access-Control-Allow-Methods':'POST,PATCH,OPTIONS',
-                'AuthToken' : localStorage.getItem(LStorage.last_auth_token) ?? "",
-                'RequestFromUser' : localStorage.getItem(LStorage.last_entered_username) ?? "",
+                'AuthToken' : sessionStorage.getItem(LStorage.last_auth_token) ?? "",
+                'RequestFromUser' : sessionStorage.getItem(LStorage.last_entered_username) ?? "",
             },
             body: JSON.stringify(body)
         };
@@ -29,7 +29,7 @@ export class ReqHelper
             const data = await response.json()
             if (data.code == CommonErrorCode.UserIsNotAuthenticated)
             {
-                localStorage.removeItem(LStorage.last_auth_token)
+                sessionStorage.removeItem(LStorage.last_auth_token)
                 router.RouteToPage(RLinks.LoginPage)
             }
             return Promise.resolve(data) 

@@ -22,7 +22,7 @@ const titleText = ref("Login?")
 const username_placeholder = ref("Enter username")
 const password_placeholder = ref("password")
 
-const input_username =  ref(localStorage.getItem(LStorage.last_entered_username) ?? "")
+const input_username =  ref(sessionStorage.getItem(LStorage.last_entered_username) ?? "")
 
 const input_password = ref("")
 
@@ -38,7 +38,8 @@ const delay = async (ms: number) => {
 const LoginBtnClicked = async() => {
     if (!InputsAreValid()) {return}
     try{
-        localStorage.setItem(LStorage.last_entered_username, input_username.value)
+        // localStorage.setItem(LStorage.last_entered_username, input_username.value)
+        sessionStorage.setItem(LStorage.last_entered_username, input_username.value)
         titleText.value = "Trying to Login..." 
         
         await delay(1000) //Fake loading time
@@ -52,7 +53,8 @@ const LoginBtnClicked = async() => {
         if (+login_response.code == CommonSuccessCode.APIRequestSuccess && login_response.authToken)
         {
             titleText.value = "Login success" 
-            localStorage.setItem(LStorage.last_auth_token, login_response.authToken)
+            // localStorage.setItem(LStorage.last_auth_token, login_response.authToken)
+            sessionStorage.setItem(LStorage.last_auth_token, login_response.authToken)
             router.RouteToPage(RLinks.Home)
             //Move to main screen
         }else if (+login_response.code == APIErrorCode.UserLoginRequest_UsernameOrPasswordIsIncorrect)

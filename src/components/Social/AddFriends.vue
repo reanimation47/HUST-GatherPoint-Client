@@ -21,7 +21,7 @@ let router = new RouterHelper()
 
 
 const titleText = ref("Logged in as")
-const user_id = ref(localStorage.getItem(LStorage.last_entered_username) ?? "unknown")
+const user_id = ref(sessionStorage.getItem(LStorage.last_entered_username) ?? "unknown")
 
 const input_username =  ref("")
 const username_placeholder = ref("Enter friend's username")
