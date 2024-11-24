@@ -11,5 +11,5 @@ export interface Get_AutoComplete_Predictions_Response_Model
     message: string,
     code: number,
     isFromCachedResults: string
-    results: string[]
+    results: {description: string, place_id:string}[] 
 }

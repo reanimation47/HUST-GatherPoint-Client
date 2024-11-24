@@ -52,7 +52,7 @@ export class ReqHelper
         return import.meta.env.VITE_APP_MAPS_API_SECRET as string
     }
 
-    static GGMAP_GetAutoComplete_Predictions_FromServer = async (input:string, router: RouterHelper): Promise<string[]> => {
+    static GGMAP_GetAutoComplete_Predictions_FromServer = async (input:string, router: RouterHelper) => {
         let req_body: Get_AutoComplete_Predictions_Model = {input: input}
         try{
             let response = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Maps_GetAutoComplete_Predictions}`, req_body, router) as Get_AutoComplete_Predictions_Response_Model

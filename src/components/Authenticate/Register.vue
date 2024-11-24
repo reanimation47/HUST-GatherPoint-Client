@@ -47,12 +47,17 @@ const delay = async (ms: number) => {
 }
 
 let addresses_suggest_Items: Ref<string[], string[]> = ref([])
+let suggestions_result: {description: string, place_id: string}[] = []
 const addressAutoComplete = async (event:any) => {
     // if (true) {return}
     if (input_address.value == "") {return}
     if (event.query.length < addr_autocomplete_minlength) {return}
 
-    addresses_suggest_Items.value = (await ReqHelper.GGMAP_GetAutoComplete_Predictions_FromServer(event.query, router))
+    suggestions_result = await ReqHelper.GGMAP_GetAutoComplete_Predictions_FromServer(event.query, router)
+    const suggestions = (suggestions_result).map((result => result.description))
+    console.log(suggestions)
+    addresses_suggest_Items.value = suggestions
+    // addresses_suggest_Items.value = (await ReqHelper.GGMAP_GetAutoComplete_Predictions_FromServer(event.query, router))
 }
 
 
@@ -67,7 +72,8 @@ const RegisterBtnClicked = async () => {
         const req_body: UserRegisterRequestModel = {
             username: input_username.value,
             password: input_password.value,
-            address: input_address.value
+            address: input_address.value,
+            address_place_id: suggestions_result.find(result => result.description == input_address.value)?.place_id ?? "Empty"
         }
         //test
         // await ReqHelper.GGMAP_Get_GeoLocation_By_Address(req_body.address)
@@ -210,7 +216,7 @@ const InputsAreValid = (): boolean => {
 
             <div class="grid place-items-center mx-7 rounded-lg shadow">
                 <!-- <input :class="input_address_anim_class + 'min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start'" type="text" :placeholder="address_placeholder" id="address" v-model="input_address"> -->
-                <AutoComplete class="min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start" v-model="input_address" id="register_addr" variant="filled" :delay='1500' size="large" :suggestions="addresses_suggest_Items" @complete="addressAutoComplete" />
+                <AutoComplete class="min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start" v-model="input_address" forceSelection id="register_addr" variant="filled" :delay='1500' size="large" :suggestions="addresses_suggest_Items" @complete="addressAutoComplete" />
             </div>
 
             <div class="grid mx-7">

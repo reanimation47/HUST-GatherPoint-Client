@@ -26,8 +26,12 @@ const user_id = ref(sessionStorage.getItem(LStorage.last_entered_username) ?? "u
 // const username_placeholder = ref("Enter username????")
 
 
-const showPopup = ref(true)
+const showPopup = ref(false)
 
+function Test(user_input:any)
+{
+    console.log(user_input.input)
+}
 
 const delay = async (ms: number) => {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -84,8 +88,10 @@ const Logout = () => {
         <Teleport to="body" v-if="showPopup">
             <div class="modal">
                 <input-popup
-                    title="Title"
-                    msg="Test"
+                    title="Test title"
+                    placeholder="input here pls"
+                    buttonText="Confirm"
+                    @confirm="Test"
                 />
                 
             </div>
