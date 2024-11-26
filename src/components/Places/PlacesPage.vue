@@ -32,11 +32,11 @@ const delay = async (ms: number) => {
 }
 
 
-const GoToAddFriendsPage = () => {
-    router.RouteToPage(RLinks.AddFriends)
+const GoToSearchPlaces = () => {
+    router.RouteToPage(RLinks.SearchPlaces)
 }
-const GoToFriendsListPage = () => {
-    router.RouteToPage(RLinks.FriendsList)
+const GoToSavedPlaces = () => {
+    router.RouteToPage(RLinks.SavedPlaces)
 }
 
 const Logout= () => {
@@ -72,11 +72,11 @@ const Logout= () => {
 
 
             <div class="grid mx-7">
-                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToAddFriendsPage" ><i></i>Add Friends</button>
+                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToSearchPlaces" ><i></i>Search Places</button>
             </div>
 
             <div class="grid mx-7">
-                <button type="button" class="text-ui-default-text-color2 rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToFriendsListPage" ><i></i>Friends list</button>
+                <button type="button" class="text-ui-default-text-color2 rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToSavedPlaces" ><i></i>Saved Places</button>
             </div>
 
             <div class="grid grid-cols-1 gap-5 mx-7 rounded-lg shadow">
