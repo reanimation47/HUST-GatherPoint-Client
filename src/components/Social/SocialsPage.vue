@@ -57,13 +57,13 @@ const Logout= () => {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
     <!--Stylesheet-->
 </head>
-<body class="bg-stone-950 grid grid-cols-1 h-screen w-screen place-content-center" >
+<body class="bg-ui-default-bg-color grid grid-cols-1 h-screen w-screen place-content-center" >
 
 
-        <div class="m-12 rounded-lg grid grid-rows-4 gap-2 pt-5 pb-7 bg-stone-900">
+        <div class="m-12 rounded-lg grid grid-rows-4 gap-2 pt-5 pb-7 bg-ui-box-color">
 
             <div class="min-h-10 rounded-lg shadow">
-                <h3 class="text-center text-xl">{{ titleText }}</h3>
+                <h3 class="text-center text-xl text-ui-default-text-color">{{ titleText }}</h3>
                 <h3 class="text-center text-2xl text-green-900">{{ user_id }}</h3>
             </div>
 
@@ -71,16 +71,16 @@ const Logout= () => {
 
 
             <div class="grid mx-7">
-                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToAddFriendsPage" ><i></i>Add Friends</button>
+                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToAddFriendsPage" ><i></i>Add Friends</button>
             </div>
 
             <div class="grid mx-7">
-                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToFriendsListPage" ><i></i>Friends list</button>
+                <button type="button" class="text-ui-default-text-color2 rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoToFriendsListPage" ><i></i>Friends list</button>
             </div>
 
             <div class="grid grid-cols-1 gap-5 mx-7 rounded-lg shadow">
                 <div class="grid bg-slate-600">
-                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-login-button-main-color hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="Logout">Go back</button>
+                    <button type="button" class="text-ui-default-text-color2 rounded-lg transition ease-in-out delay-0 bg-ui-default-secondary-button hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="Logout">Go back</button>
                 </div>
             </div>
         </div>
@@ -99,6 +99,10 @@ const Logout= () => {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+body {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-0 -0 10 10'%3E%3Cpath d='M 0 1 L 10 1 M 1 0 L 1 10' stroke='%23404040' stroke-dasharray='1' stroke-width='0.1' /%3E%3C/svg%3E"); 
+    background-size: 30px 30px;
+}
 
 /* .p-autocomplete
 {

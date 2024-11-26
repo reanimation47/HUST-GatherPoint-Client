@@ -195,37 +195,37 @@ const InputsAreValid = (): boolean => {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
     <!--Stylesheet-->
 </head>
-<body class="bg-stone-950 grid grid-cols-1 h-screen w-screen place-content-center" >
+<body class="bg-ui-default-bg-color grid grid-cols-1 h-screen w-screen place-content-center" >
 
 
-        <div class="m-12 rounded-lg grid grid-rows-6 gap-2 pt-5 pb-7 bg-stone-900">
+        <div class="m-12 rounded-lg grid grid-rows-6 gap-2 pt-5 pb-7 bg-ui-box-color">
 
             <div class="min-h-10 rounded-lg shadow">
-                <h3 class="text-center text-3xl">{{ titleText }}</h3>
+                <h3 class="text-stone-900 text-center text-3xl">{{ titleText }}</h3>
             </div>
 
             <div class="grid place-items-center mx-7 rounded-lg shadow">
                 <!-- <input :class="input_username_anim_class" type="text" :placeholder="username_placeholder" id="username" v-model="input_username"> -->
-                <input :class="input_username_anim_class + 'min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start'" type="text" :placeholder="username_placeholder" id="username" v-model="input_username">
+                <input :class="input_username_anim_class + 'min-h-12 min-w-full p-2 text-xl bg-ui-default-input-color text-stone-900 rounded-lg text-start'" type="text" :placeholder="username_placeholder" id="username" v-model="input_username">
             </div>
 
             <div class="grid place-items-center mx-7 rounded-lg shadow">
                 <!-- <input :class="input_password_anim_class" type="password" :placeholder="password_placeholder" id="password" v-model="input_password"> -->
-                <input :class="input_password_anim_class+'min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start'" type="password" :placeholder="password_placeholder" id="password" v-model="input_password">
+                <input :class="input_password_anim_class+'min-h-12 min-w-full p-2 text-xl bg-ui-default-input-color text-stone-900 rounded-lg text-start'" type="password" :placeholder="password_placeholder" id="password" v-model="input_password">
             </div>
 
             <div class="grid place-items-center mx-7 rounded-lg shadow">
                 <!-- <input :class="input_address_anim_class + 'min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start'" type="text" :placeholder="address_placeholder" id="address" v-model="input_address"> -->
-                <AutoComplete class="min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start" v-model="input_address" forceSelection id="register_addr" variant="filled" :delay='1500' size="large" :suggestions="addresses_suggest_Items" @complete="addressAutoComplete" />
+                <AutoComplete class="min-h-12 min-w-full p-2 text-xl bg-ui-default-input-color text-stone-900 rounded-lg text-start" inputClass="bg-slate-100" panelClass="bg-slate-100" v-model="input_address" forceSelection id="register_addr" variant="filled" :delay='1500' size="large" :suggestions="addresses_suggest_Items" @complete="addressAutoComplete" />
             </div>
 
             <div class="grid mx-7">
-                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-cyan-600 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="RegisterBtnClicked" ><i></i>Register</button>
+                <button type="button" class="text-stone-950 rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="RegisterBtnClicked" ><i></i>Register</button>
             </div>
 
             <div class="grid grid-cols-1 gap-5 mx-7 rounded-lg shadow">
                 <div class="grid bg-slate-600">
-                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-login-button-main-color hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="GoToLoginPage">Go To Login Page</button>
+                    <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-ui-default-secondary-button hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="GoToLoginPage">Go To Login Page</button>
                 </div>
             </div>
         </div>
@@ -245,6 +245,11 @@ const InputsAreValid = (): boolean => {
 @tailwind components;
 @tailwind utilities;
 
+body {
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-0 -0 10 10'%3E%3Cpath d='M 0 1 L 10 1 M 1 0 L 1 10' stroke='%23404040' stroke-dasharray='1' stroke-width='0.1' /%3E%3C/svg%3E"); 
+    background-size: 30px 30px;
+}
 /* .p-autocomplete
 {
     width: 100%;

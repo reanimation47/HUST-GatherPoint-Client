@@ -74,13 +74,13 @@ const FriendItemClicked = () => {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
     <!--Stylesheet-->
 </head>
-<body class="bg-stone-950 grid grid-cols-1 h-screen w-screen place-content-center" >
+<body class="bg-ui-default-bg-color grid grid-cols-1 h-screen w-screen place-content-center" >
 
 
-        <div class="m-12 rounded-lg gap-2 pt-5 pb-7 bg-stone-900">
+        <div class="m-12 rounded-lg gap-2 pt-5 pb-7 bg-ui-box-color">
 
             <div class="min-h-10 rounded-lg shadow">
-                <h3 class="text-center text-xl">{{ titleText }}</h3>
+                <h3 class="text-center text-xl text-ui-default-text-color">{{ titleText }}</h3>
                 <h3 class="text-center text-2xl text-green-900">{{ user_id }}</h3>
             </div>
 
@@ -92,7 +92,7 @@ const FriendItemClicked = () => {
             <div>
                 <ul class="grid grid-flow-row grid-cols-1 gap-2 mt-4 mx-7">
                     <li class="" v-for="friend in list_friends" >
-                        <button type="button" class="rounded-lg min-h-10 w-full transition ease-in-out delay-0 bg-friend-list-item hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="FriendItemClicked">{{ friend }}</button>
+                        <button type="button" class="text-ui-default-text-color2 rounded-lg min-h-10 w-full transition ease-in-out delay-0 bg-friend-list-item hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="FriendItemClicked">{{ friend }}</button>
                     </li>
                 </ul>
             </div>
@@ -119,6 +119,10 @@ const FriendItemClicked = () => {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+body {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-0 -0 10 10'%3E%3Cpath d='M 0 1 L 10 1 M 1 0 L 1 10' stroke='%23404040' stroke-dasharray='1' stroke-width='0.1' /%3E%3C/svg%3E"); 
+    background-size: 30px 30px;
+}
 
 /* .p-autocomplete
 {

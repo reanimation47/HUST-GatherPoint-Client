@@ -10,10 +10,20 @@ export default {
             '70/30': ' 70% 28%'
         },
         colors: {
-          'login-button-main-color': '#998650',
+          'login-button-main-color': '#89A8B2',
           'login-button-skip-color': '#A7754D',
-          'friend-list-item': '#8D9EC6',
+          'friend-list-item': '#284B63',
           'popup-input': '#8D9EC6',
+
+          'ui-box-color': '#B3C8CF',
+          'ui-default-input-color': '#F1F0E8',
+          'ui-default-bg-color': '#f8fafc',
+          'ui-default-text-color': '#1c1917',
+          'ui-default-text-color2': '#f8fafc',
+          'ui-default-main-button': '#89A8B2',
+          'ui-default-main-button2': '#284B63',
+          'ui-default-secondary-button': '#153243'
+
         }
         
     },
