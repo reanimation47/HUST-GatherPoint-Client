@@ -47,6 +47,8 @@ const delay = async (ms: number) => {
 
 //Add options
 const showAddOption = ref(false)
+const pickedAddOption = ref()
+const showUserInputBox = ref(false)
 
 enum eAddOption{
     AddFriend = "Add a friend",
@@ -63,29 +65,30 @@ const AddButtonClicked = () => {
     showAddOption.value = true
 }
 
-const UserAddPickedAddOption = (option: {option:string}) =>
+const UserPickedAddOption = (option: {option:string}) =>
 {
     showAddOption.value = false 
+    showUserInputBox.value = true
     if (option.option == eAddOption.AddFriend)
     {
+        pickedAddOption.value = eAddOption.AddFriend
         console.log("add fr")
     }
 
     if (option.option == eAddOption.AddAddress)
     {
+        pickedAddOption.value = eAddOption.AddAddress
         console.log("add addr")
     }
 }
 
-
-const GoToSavedPlaces = () => {
-    router.RouteToPage(RLinks.SavedPlaces)
+const confirmedAddresses: Ref<any,any> = ref([])
+const UserConfirmInput = (option: {input:string}) => {
+    console.log(option.input)
+    showUserInputBox.value = false 
+    confirmedAddresses.value.push(option.input)
 }
 
-const Logout= () => {
-    //TODO: clear credentials before going back to login back
-    router.RouteToPage(RLinks.Home)
-}
 
 </script>
 
@@ -109,7 +112,19 @@ const Logout= () => {
                     placeholder="input here pls"
                     buttonText="Confirm"
                     :options="addOptions"
-                    @confirm="UserAddPickedAddOption"
+                    @confirm="UserPickedAddOption"
+                />
+                
+            </div>
+        </Teleport>
+
+        <Teleport to="body" v-if="showUserInputBox">
+            <div class="modal">
+                <input-popup
+                    :title="pickedAddOption"
+                    placeholder="input here pls"
+                    buttonText="Confirm"
+                    @confirm="UserConfirmInput"
                 />
                 
             </div>
@@ -138,6 +153,12 @@ const Logout= () => {
             <div class="grid mx-20 h-11">
                 <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="AddButtonClicked" ><i></i>Add</button>
             </div>
+
+            <ul class="grid grid-flow-row grid-cols-1 gap-2 mt-4 mx-7">
+                <li class="" v-for="address in confirmedAddresses" >
+                    <button @click="" type="button" class="bg-ui-default-main-button text-ui-default-text-color rounded-lg min-h-10 w-full transition ease-in-out delay-0  hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" >{{ address }}</button>
+                </li>
+            </ul>
 
 
         </div>
