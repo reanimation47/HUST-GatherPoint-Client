@@ -4,7 +4,7 @@ import { ref, type Ref } from 'vue';
 import {type UserLoginRequestModel, type UserRegisterRequestModel } from '../../Models/API_Requests/API_Request_Models'
 import {API_URL} from '../../Models/API_Requests/API_Request_URLs'
 import {APIErrorCode, CommonSuccessCode, NetworkErrorCode} from '../../Models/Common/ErrorCodes'
-import {type UserLoginResponseModel} from '../../Models/API_Responses/API_Response_Models'
+import {type Get_Friend_Address_Response_Model, type UserLoginResponseModel} from '../../Models/API_Responses/API_Response_Models'
 import {LStorage} from '../../configurations/localStorage_Keys'
 import {CoreConfiguration} from '../../configurations/coreConfig'
 import {ReqHelper} from '../../helpers/RequestsHelper'
@@ -20,6 +20,7 @@ import { RouterHelper } from '@/helpers/RouterHelper';
 import Dropdown from 'primevue/dropdown';
 import InputPopup from '../Modals/InputPopup.vue';
 import OptionsPopup from '../Modals/OptionsPopup.vue';
+import { eAddOption } from '@/core/clientEnums';
 
 let router = new RouterHelper() 
 
@@ -50,10 +51,6 @@ const showAddOption = ref(false)
 const pickedAddOption = ref()
 const showUserInputBox = ref(false)
 
-enum eAddOption{
-    AddFriend = "Add a friend",
-    AddAddress = "Add an address"
-}
 const addOptions = ref([
     eAddOption.AddFriend.toString(),
     eAddOption.AddAddress.toString(),
@@ -65,28 +62,51 @@ const AddButtonClicked = () => {
     showAddOption.value = true
 }
 
-const UserPickedAddOption = (option: {option:string}) =>
+const UserPickedAddOption = async (option: {option:string}) =>
 {
     showAddOption.value = false 
     showUserInputBox.value = true
     if (option.option == eAddOption.AddFriend)
     {
         pickedAddOption.value = eAddOption.AddFriend
-        console.log("add fr")
     }
 
     if (option.option == eAddOption.AddAddress)
     {
         pickedAddOption.value = eAddOption.AddAddress
-        console.log("add addr")
     }
 }
 
-const confirmedAddresses: Ref<any,any> = ref([])
-const UserConfirmInput = (option: {input:string}) => {
+const confirmedAddresses: Ref<string[], string[]> = ref([])
+const UserConfirmInput = async (option: {input:string}) => {
     console.log(option.input)
     showUserInputBox.value = false 
-    confirmedAddresses.value.push(option.input)
+
+    if (pickedAddOption.value == eAddOption.AddFriend)
+    {
+        const get_friends_address_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_GetFriendAddress}`, {username: option.input}, router) as Get_Friend_Address_Response_Model
+        console.log(get_friends_address_result.code)
+        if (get_friends_address_result.code == CommonSuccessCode.APIRequestSuccess && get_friends_address_result.address && get_friends_address_result.address_place_id)
+        {
+            if (!confirmedAddresses.value.includes(get_friends_address_result.address))
+            {
+                confirmedAddresses.value.push(get_friends_address_result.address)
+            }
+            return
+        }else
+        {
+            return
+        }
+    }
+
+    if (pickedAddOption.value == eAddOption.AddAddress)
+    {
+
+        if (!confirmedAddresses.value.includes(option.input))
+        {
+            confirmedAddresses.value.push(option.input)
+        }
+    }
 }
 
 
