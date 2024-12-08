@@ -3,9 +3,9 @@
         <h2 class="text-2xl"> {{ title }}</h2>
             <div class="w-full mx-3 mt-2 mb-2">
                 <!-- <input class="'min-h-12 min-w-full p-2 text-xl bg-gray-700 rounded-lg text-start'" type="text" :placeholder="placeholder" id="username" v-model="user_input"> -->
-                <AutoComplete  class="min-h-12 w-full p-2 text-xl  rounded-lg text-start" forceSelection v-model="user_input" id="register_addr" variant="filled" :delay='200' size="large" :suggestions="found_suggestions" @complete="trigger_autocomplete" />
+                <AutoComplete  class="min-h-12 w-full p-2 text-xl  rounded-lg text-start" forceSelection v-model="user_input" id="register_addr" variant="filled" :delay='1500' size="large" :suggestions="found_suggestions" @complete="trigger_autocomplete" />
             </div>
-        <button @click="$emit('confirm', {input:user_input})" class="rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300 p-1 w-1/3">{{ buttonText }}</button>
+        <button @click="$emit('confirm', {input:user_input, found_suggestions_full_data: found_suggestions_full_data})" class="rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300 p-1 w-1/3">{{ buttonText }}</button>
     </div>
 </template>
 
@@ -24,10 +24,11 @@ const props = defineProps({
 })
 
 
-console.log(props.title == eAddOption.AddFriend.toString())
+// console.log(props.title == eAddOption.AddFriend.toString())
 
 const user_input = ref("")
 const found_suggestions = ref([""])
+const found_suggestions_full_data = ref()
 const trigger_autocomplete = async () => {
     let router = new RouterHelper() 
     found_suggestions.value = ["placeholder"]
@@ -49,8 +50,9 @@ const trigger_autocomplete = async () => {
 
         let suggestions_result: {description: string, place_id: string}[] = []
         suggestions_result = await ReqHelper.GGMAP_GetAutoComplete_Predictions_FromServer(user_input.value, router)
+        found_suggestions_full_data.value = suggestions_result
         const suggestions = (suggestions_result).map((result => result.description))
-        console.log(suggestions)
+        // console.log(suggestions)
         found_suggestions.value = suggestions
     }
 }

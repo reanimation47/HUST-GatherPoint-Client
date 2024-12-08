@@ -62,6 +62,10 @@ const AddButtonClicked = () => {
     showAddOption.value = true
 }
 
+const LetsGoButtonClicked = () => {
+    //TODO
+}
+
 const UserPickedAddOption = async (option: {option:string}) =>
 {
     showAddOption.value = false 
@@ -78,8 +82,9 @@ const UserPickedAddOption = async (option: {option:string}) =>
 }
 
 const confirmedAddresses: Ref<string[], string[]> = ref([])
-const UserConfirmInput = async (option: {input:string}) => {
-    console.log(option.input)
+const confirmedAddresses_placeId_Map = new Map<string,string>() //<place_id,address>
+const UserConfirmInput = async (option: {input:string, found_suggestions_full_data:any}) => {
+    // console.log(option.input)
     showUserInputBox.value = false 
 
     if (pickedAddOption.value == eAddOption.AddFriend)
@@ -91,8 +96,8 @@ const UserConfirmInput = async (option: {input:string}) => {
             if (!confirmedAddresses.value.includes(get_friends_address_result.address))
             {
                 confirmedAddresses.value.push(get_friends_address_result.address)
+                confirmedAddresses_placeId_Map.set(get_friends_address_result.address_place_id, get_friends_address_result.address)
             }
-            return
         }else
         {
             return
@@ -104,9 +109,13 @@ const UserConfirmInput = async (option: {input:string}) => {
 
         if (!confirmedAddresses.value.includes(option.input))
         {
+            const target_address_data = option.found_suggestions_full_data.find((data:any) => data.description == option.input)
+            confirmedAddresses_placeId_Map.set(target_address_data.place_id, option.input)
             confirmedAddresses.value.push(option.input)
         }
     }
+
+    console.log(confirmedAddresses_placeId_Map)
 }
 
 
@@ -179,6 +188,10 @@ const UserConfirmInput = async (option: {input:string}) => {
                     <button @click="" type="button" class="bg-ui-default-main-button text-ui-default-text-color rounded-lg min-h-10 w-full transition ease-in-out delay-0  hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" >{{ address }}</button>
                 </li>
             </ul>
+
+            <div class="grid mx-20 h-11">
+                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="LetsGoButtonClicked" ><i></i>Add</button>
+            </div>
 
 
         </div>
