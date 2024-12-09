@@ -35,6 +35,7 @@ export class ReqHelper
             return Promise.resolve(data) 
         }catch
         {
+            //Maybe just return the error here instead of throwing it ? :/
             throw {
                 message: "Cannot reach server",
                 code: NetworkErrorCode.CannotReachBackendServer

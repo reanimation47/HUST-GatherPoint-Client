@@ -1,10 +1,10 @@
 
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
-import {type UserLoginRequestModel, type UserRegisterRequestModel } from '../../Models/API_Requests/API_Request_Models'
+import {type Get_Best_Locations_Request_Model, type UserLoginRequestModel, type UserRegisterRequestModel } from '../../Models/API_Requests/API_Request_Models'
 import {API_URL} from '../../Models/API_Requests/API_Request_URLs'
 import {APIErrorCode, CommonSuccessCode, NetworkErrorCode} from '../../Models/Common/ErrorCodes'
-import {type Get_Friend_Address_Response_Model, type UserLoginResponseModel} from '../../Models/API_Responses/API_Response_Models'
+import {type Get_Best_Locations_Response_Model, type Get_Friend_Address_Response_Model, type UserLoginResponseModel} from '../../Models/API_Responses/API_Response_Models'
 import {LStorage} from '../../configurations/localStorage_Keys'
 import {CoreConfiguration} from '../../configurations/coreConfig'
 import {ReqHelper} from '../../helpers/RequestsHelper'
@@ -46,15 +46,16 @@ const delay = async (ms: number) => {
 }
 
 
-//Add options
 const showAddOption = ref(false)
-const pickedAddOption = ref()
 const showUserInputBox = ref(false)
+const readyToGo = ref(false)
 
+//Add options
 const addOptions = ref([
     eAddOption.AddFriend.toString(),
     eAddOption.AddAddress.toString(),
 ])
+const pickedAddOption = ref()
 
 
 
@@ -62,8 +63,23 @@ const AddButtonClicked = () => {
     showAddOption.value = true
 }
 
-const LetsGoButtonClicked = () => {
-    //TODO
+const LetsGoButtonClicked = async () => {
+    const final_list_of_place_ids = Array.from(confirmedAddresses_placeId_Map.keys())
+    console.log(final_list_of_place_ids)
+    const request:Get_Best_Locations_Request_Model = {
+        place_ids:final_list_of_place_ids,
+        options:{
+        }
+    }
+
+    try{
+        const get_best_locations_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Maps_Get_BestLocations_By_Adddresses}`, {request}, router) as Get_Best_Locations_Response_Model
+        console.log("results:")
+        console.log(get_best_locations_result)
+    }catch(e)
+    {
+        console.log("TODO: LETS GO ERROR")
+    }
 }
 
 const UserPickedAddOption = async (option: {option:string}) =>
@@ -89,8 +105,8 @@ const UserConfirmInput = async (option: {input:string, found_suggestions_full_da
 
     if (pickedAddOption.value == eAddOption.AddFriend)
     {
+        //TODO: handle error for this
         const get_friends_address_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_GetFriendAddress}`, {username: option.input}, router) as Get_Friend_Address_Response_Model
-        console.log(get_friends_address_result.code)
         if (get_friends_address_result.code == CommonSuccessCode.APIRequestSuccess && get_friends_address_result.address && get_friends_address_result.address_place_id)
         {
             if (!confirmedAddresses.value.includes(get_friends_address_result.address))
@@ -114,6 +130,8 @@ const UserConfirmInput = async (option: {input:string, found_suggestions_full_da
             confirmedAddresses.value.push(option.input)
         }
     }
+
+    readyToGo.value = confirmedAddresses.value.length > 1 ? true : false
 
     console.log(confirmedAddresses_placeId_Map)
 }
@@ -189,8 +207,8 @@ const UserConfirmInput = async (option: {input:string, found_suggestions_full_da
                 </li>
             </ul>
 
-            <div class="grid mx-20 h-11">
-                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="LetsGoButtonClicked" ><i></i>Add</button>
+            <div class="grid mx-20 h-11" v-if="readyToGo">
+                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="LetsGoButtonClicked" ><i></i>Lets Go</button>
             </div>
 
 
