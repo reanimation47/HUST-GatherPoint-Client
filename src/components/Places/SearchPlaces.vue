@@ -12,6 +12,7 @@ import axios from 'axios'
 import { useScrollLock } from '@vueuse/core'
 
 import AutoComplete from 'primevue/autocomplete';
+import { GoogleMap, AdvancedMarker } from 'vue3-google-map'
 
 
 import { RLinks } from '@/configurations/routerLinks';
@@ -21,6 +22,8 @@ import Dropdown from 'primevue/dropdown';
 import InputPopup from '../Modals/InputPopup.vue';
 import OptionsPopup from '../Modals/OptionsPopup.vue';
 import { eAddOption } from '@/core/clientEnums';
+
+//##### Add Addresses & Options screen here
 
 let router = new RouterHelper() 
 
@@ -49,6 +52,7 @@ const delay = async (ms: number) => {
 const showAddOption = ref(false)
 const showUserInputBox = ref(false)
 const readyToGo = ref(false)
+const showBestLocations = ref(false)
 
 //Add options
 const addOptions = ref([
@@ -76,6 +80,19 @@ const LetsGoButtonClicked = async () => {
         const get_best_locations_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Maps_Get_BestLocations_By_Adddresses}`, {request}, router) as Get_Best_Locations_Response_Model
         console.log("results:")
         console.log(get_best_locations_result)
+        if (!Array.isArray(get_best_locations_result.result)) {throw Error("Bad data format from BE response")}
+        DATA_best_locations = get_best_locations_result.result //store the data for future use
+        maps_centerpoint = get_best_locations_result.centerpoint
+        get_best_locations_result.result.forEach(result => {
+            if(result?.geometry?.location?.lat && result?.geometry?.location?.lng)
+            {
+                maps_suggested_locations.push(result.geometry.location)
+            }
+
+        })
+        MapUpdated()
+
+        showBestLocations.value = true
     }catch(e)
     {
         console.log("TODO: LETS GO ERROR")
@@ -137,6 +154,44 @@ const UserConfirmInput = async (option: {input:string, found_suggestions_full_da
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//############## Show Best Locations Screen
+const maps_api_key = import.meta.env.VITE_APP_MAPS_API_SECRET
+
+//Map values //DEFAULT
+let maps_centerpoint = { lat: 40.689247, lng: -74.044502 }
+let maps_suggested_locations: {lat:number,lng:number}[] = []
+let center_markerOptions = { position: maps_centerpoint, title: 'CENTER POINT' }
+const center_pinOptions = { background: '#074F57' }
+const suggested_pinOptions = { background: '#74A57F' }
+
+let DATA_best_locations:any
+
+const MapUpdated = () =>{
+    // maps_centerpoint = { lat: 40.689247, lng: -74.044502 }
+    // maps_suggested_locations = []
+    center_markerOptions = { position: maps_centerpoint, title: 'CENTER POINT' }
+}
+
+const GoBackToInputScreen = async () => {
+    showBestLocations.value = false
+}
+
 </script>
 
 <template>
@@ -178,7 +233,7 @@ const UserConfirmInput = async (option: {input:string, found_suggestions_full_da
         </Teleport>
 
 
-        <div class="m-12 rounded-lg grid gap-2 pt-5 pb-7 bg-ui-box-color">
+        <div v-if="!showBestLocations"  class="m-12 rounded-lg grid gap-2 pt-5 pb-7 bg-ui-box-color">
 
             <div class="min-h-10 rounded-lg shadow">
                 <h3 class="text-center text-xl text-ui-default-text-color">{{ titleText }}</h3>
@@ -211,6 +266,27 @@ const UserConfirmInput = async (option: {input:string, found_suggestions_full_da
                 <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="LetsGoButtonClicked" ><i></i>Lets Go</button>
             </div>
 
+
+
+
+        </div>
+
+        <div v-if="showBestLocations" class="m-12 rounded-lg grid gap-2 pt-5 pb-7 bg-ui-box-color">
+            <div class="grid mx-20 h-11" v-if="readyToGo">
+                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoBackToInputScreen" ><i></i>Go Back</button>
+            </div>
+            <GoogleMap
+                :api-key="maps_api_key"
+                mapId="DEMO_MAP_ID"
+                style="width: 100%; height: 500px"
+                :center="maps_centerpoint"
+                :zoom="15"
+            >
+                <AdvancedMarker :options="center_markerOptions" :pin-options="center_pinOptions"/>
+                <li v-for="position in maps_suggested_locations">
+                    <AdvancedMarker :options="{position: position}" :pin-options="suggested_pinOptions"/>
+                </li>
+            </GoogleMap>
 
         </div>
 
