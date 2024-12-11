@@ -43,7 +43,7 @@ const user_id = ref(sessionStorage.getItem(LStorage.last_entered_username) ?? "u
 
 const selectedPlaceType = ref()
 const placeTypes = ref([
-    {type: "coffee", code: 1},
+    {type: "cafe", code: 1},
     {type: "restaurant", code: 2},
 ])
 
@@ -71,6 +71,9 @@ const addOptions = ref([
 const pickedAddOption = ref()
 
 
+const GoBackButtonClicked = () => {
+    router.RouteToPage(RLinks.PlacesPage)
+}
 
 const AddButtonClicked = () => {
     showAddOption.value = true
@@ -82,8 +85,11 @@ const LetsGoButtonClicked = async () => {
     const request:Get_Best_Locations_Request_Model = {
         place_ids:final_list_of_place_ids,
         options:{
+            radius: 5000,
+            type: selectedPlaceType.value.type
         }
     }
+    console.log(request.options)
 
     try{
         const get_best_locations_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Maps_Get_BestLocations_By_Adddresses}`, {request}, router) as Get_Best_Locations_Response_Model
@@ -257,6 +263,9 @@ const GoBackToInputScreen = async () => {
 
 
         <div v-if="!showBestLocations"  class="m-12 rounded-lg grid gap-2 pt-5 pb-7 bg-ui-box-color">
+            <div class="grid mx-20 h-11">
+                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="GoBackButtonClicked" ><i></i>Go Back</button>
+            </div>
 
             <div class="min-h-10 rounded-lg shadow">
                 <h3 class="text-center text-xl text-ui-default-text-color">{{ titleText }}</h3>
