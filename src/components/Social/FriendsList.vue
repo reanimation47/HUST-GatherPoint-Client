@@ -58,20 +58,23 @@ const GoBack = () => {
 }
 
 //Friend Items 
+
+const FRIEND_ITEM_OPTIONS = [
+    "Address: $user_address$",
+    "Remove Friend"
+]
 const arr_info:string[] = []
 const show_friend_info = ref(false)
 const friend_info_options = ref(arr_info)
 
 const target_friend_username = ref("")
 const FriendItemClicked = async (friend_username: string) => {
-    console.log("item clicked:")
-    console.log(friend_username)
 
     try {
         const get_friends_address_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_GetFriendAddress}`, {username: friend_username}, router) as Get_Friend_Address_Response_Model
         if (get_friends_address_result.code == CommonSuccessCode.APIRequestSuccess && get_friends_address_result.address && get_friends_address_result.address_place_id)
         {
-            arr_info.push(`Address: \n${get_friends_address_result.address}`)
+            arr_info.push(FRIEND_ITEM_OPTIONS[0].replace("$user_address$", get_friends_address_result.address))
         }else
         {
             arr_info.push("Error trying to retrieve this user's address")
@@ -81,10 +84,15 @@ const FriendItemClicked = async (friend_username: string) => {
         arr_info.push("Error trying to retrieve this user's address")
     }
 
-    arr_info.push("Remove friend")
+    arr_info.push(FRIEND_ITEM_OPTIONS[1])
     target_friend_username.value = friend_username
     show_friend_info.value = true
     //TODO
+}
+
+const FriendItemPopupItemClicked = (option:{option:string}) => {
+    console.log(option.option)
+
 }
 
 </script>
@@ -110,7 +118,7 @@ const FriendItemClicked = async (friend_username: string) => {
                     placeholder="input here pls"
                     buttonText="Confirm"
                     :options="friend_info_options"
-                    @confirm=""
+                    @confirm="FriendItemPopupItemClicked"
                 />
                 
             </div>
