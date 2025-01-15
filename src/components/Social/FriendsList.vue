@@ -3,7 +3,7 @@ import { onBeforeMount, ref, type Ref } from 'vue';
 import {type UserLoginRequestModel, type UserRegisterRequestModel } from '../../Models/API_Requests/API_Request_Models'
 import {API_URL} from '../../Models/API_Requests/API_Request_URLs'
 import {APIErrorCode, CommonSuccessCode, NetworkErrorCode} from '../../Models/Common/ErrorCodes'
-import {type UserLoginResponseModel} from '../../Models/API_Responses/API_Response_Models'
+import {type Get_Friend_Address_Response_Model, type UserLoginResponseModel} from '../../Models/API_Responses/API_Response_Models'
 import {LStorage} from '../../configurations/localStorage_Keys'
 import {CoreConfiguration} from '../../configurations/coreConfig'
 import {ReqHelper} from '../../helpers/RequestsHelper'
@@ -12,6 +12,7 @@ import { useScrollLock } from '@vueuse/core'
 
 import AutoComplete from 'primevue/autocomplete';
 
+import OptionsPopup from '../Modals/OptionsPopup.vue';
 
 import { RLinks } from '@/configurations/routerLinks';
 import { Capacitor } from '@capacitor/core';
@@ -56,7 +57,33 @@ const GoBack = () => {
     router.RouteToPage(RLinks.SocialPage)
 }
 
-const FriendItemClicked = () => {
+//Friend Items 
+const arr_info:string[] = []
+const show_friend_info = ref(false)
+const friend_info_options = ref(arr_info)
+
+const target_friend_username = ref("")
+const FriendItemClicked = async (friend_username: string) => {
+    console.log("item clicked:")
+    console.log(friend_username)
+
+    try {
+        const get_friends_address_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_GetFriendAddress}`, {username: friend_username}, router) as Get_Friend_Address_Response_Model
+        if (get_friends_address_result.code == CommonSuccessCode.APIRequestSuccess && get_friends_address_result.address && get_friends_address_result.address_place_id)
+        {
+            arr_info.push(`Address: \n${get_friends_address_result.address}`)
+        }else
+        {
+            arr_info.push("Error trying to retrieve this user's address")
+        }
+    }catch
+    {
+        arr_info.push("Error trying to retrieve this user's address")
+    }
+
+    arr_info.push("Remove friend")
+    target_friend_username.value = friend_username
+    show_friend_info.value = true
     //TODO
 }
 
@@ -76,6 +103,18 @@ const FriendItemClicked = () => {
 </head>
 <body class="bg-ui-default-bg-color grid grid-cols-1 h-screen w-screen place-content-center" >
 
+        <Teleport to="body" v-if="show_friend_info">
+            <div class="modal">
+                <options-popup
+                    :title=target_friend_username
+                    placeholder="input here pls"
+                    buttonText="Confirm"
+                    :options="friend_info_options"
+                    @confirm=""
+                />
+                
+            </div>
+        </Teleport>
 
         <div class="m-12 rounded-lg gap-2 pt-5 pb-7 bg-ui-box-color">
 
@@ -92,7 +131,7 @@ const FriendItemClicked = () => {
             <div>
                 <ul class="grid grid-flow-row grid-cols-1 gap-2 mt-4 mx-7">
                     <li class="" v-for="friend in list_friends" >
-                        <button type="button" class="text-ui-default-text-color2 rounded-lg min-h-10 w-full transition ease-in-out delay-0 bg-friend-list-item hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="FriendItemClicked">{{ friend }}</button>
+                        <button type="button" class="text-ui-default-text-color2 rounded-lg min-h-10 w-full transition ease-in-out delay-0 bg-friend-list-item hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="FriendItemClicked(friend)">{{ friend }}</button>
                     </li>
                 </ul>
             </div>
@@ -137,4 +176,14 @@ body {
     border-radius: 0.5rem;
  } */
 
+ .modal{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+ }
 </style>

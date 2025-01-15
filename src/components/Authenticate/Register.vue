@@ -49,9 +49,12 @@ const delay = async (ms: number) => {
 let addresses_suggest_Items: Ref<string[], string[]> = ref([])
 let suggestions_result: {description: string, place_id: string}[] = []
 const addressAutoComplete = async (event:any) => {
+    console.log("1")
     // if (true) {return}
     if (input_address.value == "") {return}
+    console.log("2")
     if (event.query.length < addr_autocomplete_minlength) {return}
+    console.log("3")
 
     suggestions_result = await ReqHelper.GGMAP_GetAutoComplete_Predictions_FromServer(event.query, router)
     const suggestions = (suggestions_result).map((result => result.description))
