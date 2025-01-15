@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-popup-input/90 box-border h-40 w-3/4 border-4 text-center pt-0">
+    <div class="popup bg-popup-input/90 box-border pb-4 h-fit w-3/4 border-4 text-center pt-0">
         <h2 class="text-2xl"> {{ title }}</h2>
         <ul class="grid grid-flow-row grid-cols-1 gap-2 mt-4 mx-7">
             <li class="" v-for="option in options" >
@@ -36,5 +36,6 @@ const user_input = ref("")
     height: 3rem;
     border-radius: 0.5rem;
  } */
+
 
 </style>

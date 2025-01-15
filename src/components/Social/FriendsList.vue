@@ -62,7 +62,8 @@ const GoBack = () => {
 
 const FRIEND_ITEM_OPTIONS = {
     ADDRESS: "Address: $user_address$",
-    REMOVE_FRIEND: "Remove Friend"
+    REMOVE_FRIEND: "Remove Friend",
+    CLOSE: "Close"
 }
 const arr_info:string[] = []
 const show_friend_info = ref(false)
@@ -88,6 +89,7 @@ const FriendItemClicked = async (friend_username: string) => {
     }
 
     arr_info.push(FRIEND_ITEM_OPTIONS.REMOVE_FRIEND)
+    arr_info.push(FRIEND_ITEM_OPTIONS.CLOSE)
     target_friend_username.value = friend_username
     show_friend_info.value = true
     //TODO
@@ -95,7 +97,12 @@ const FriendItemClicked = async (friend_username: string) => {
 
 const FriendItemPopupItemClicked = (option:{option:string}) => {
     arr_info.length = 0 //Clear array?
-    if (option.option == FRIEND_ITEM_OPTIONS.REMOVE_FRIEND)
+
+    if (option.option == FRIEND_ITEM_OPTIONS.CLOSE)
+    {
+        show_friend_info.value = false
+    }
+    else if (option.option == FRIEND_ITEM_OPTIONS.REMOVE_FRIEND)
     {
         show_friend_info.value = false
         //TODO
@@ -206,4 +213,5 @@ body {
     justify-content: center;
     align-items: center;
  }
+
 </style>
