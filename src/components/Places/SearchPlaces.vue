@@ -211,8 +211,9 @@ const MapUpdated = () =>{
 }
 
 const RedirectToGoogleMap = (place_id:string) => {
-    const query_url = `https://www.google.com/maps/place/?q=place_id:${place_id}`
-    window.open(query_url, '_blank')?.focus();
+    // const query_url = `https://www.google.com/maps/place/?q=place_id:${place_id}`
+    // window.open(query_url, '_blank')?.focus();
+    router.RedirectToGoogleMap(place_id)
 
 
 }

@@ -41,6 +41,7 @@ onBeforeMount( async () => {
     if (Array.isArray(get_friends_list_result.result))
     {
         list_friends.value = get_friends_list_result.result
+        console.log(get_friends_list_result.result)
     }
 })
 
@@ -59,22 +60,24 @@ const GoBack = () => {
 
 //Friend Items 
 
-const FRIEND_ITEM_OPTIONS = [
-    "Address: $user_address$",
-    "Remove Friend"
-]
+const FRIEND_ITEM_OPTIONS = {
+    ADDRESS: "Address: $user_address$",
+    REMOVE_FRIEND: "Remove Friend"
+}
 const arr_info:string[] = []
 const show_friend_info = ref(false)
 const friend_info_options = ref(arr_info)
 
 const target_friend_username = ref("")
+let target_friend_address_place_id = "" //Store most recently selected friend's address's place_id
 const FriendItemClicked = async (friend_username: string) => {
 
     try {
         const get_friends_address_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_GetFriendAddress}`, {username: friend_username}, router) as Get_Friend_Address_Response_Model
         if (get_friends_address_result.code == CommonSuccessCode.APIRequestSuccess && get_friends_address_result.address && get_friends_address_result.address_place_id)
         {
-            arr_info.push(FRIEND_ITEM_OPTIONS[0].replace("$user_address$", get_friends_address_result.address))
+            arr_info.push(FRIEND_ITEM_OPTIONS.ADDRESS.replace("$user_address$", get_friends_address_result.address))
+            target_friend_address_place_id = get_friends_address_result.address_place_id
         }else
         {
             arr_info.push("Error trying to retrieve this user's address")
@@ -84,14 +87,23 @@ const FriendItemClicked = async (friend_username: string) => {
         arr_info.push("Error trying to retrieve this user's address")
     }
 
-    arr_info.push(FRIEND_ITEM_OPTIONS[1])
+    arr_info.push(FRIEND_ITEM_OPTIONS.REMOVE_FRIEND)
     target_friend_username.value = friend_username
     show_friend_info.value = true
     //TODO
 }
 
 const FriendItemPopupItemClicked = (option:{option:string}) => {
-    console.log(option.option)
+    arr_info.length = 0 //Clear array?
+    if (option.option == FRIEND_ITEM_OPTIONS.REMOVE_FRIEND)
+    {
+        show_friend_info.value = false
+        //TODO
+    }else if (option.option.startsWith(FRIEND_ITEM_OPTIONS.ADDRESS.replace("$user_address$", "")))
+    {
+        router.RedirectToGoogleMap(target_friend_address_place_id)
+    }
+
 
 }
 
