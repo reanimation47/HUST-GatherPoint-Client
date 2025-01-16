@@ -23,9 +23,12 @@ export interface Get_Best_Locations_Request_Model
     options: any
 }
 
-
-
 export interface Social_AddFriend_Request_Model
+{
+    username: string
+}
+
+export interface Social_RemoveFriend_Request_Model
 {
     username: string
 }

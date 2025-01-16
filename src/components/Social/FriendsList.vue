@@ -95,7 +95,7 @@ const FriendItemClicked = async (friend_username: string) => {
     //TODO
 }
 
-const FriendItemPopupItemClicked = (option:{option:string}) => {
+const FriendItemPopupItemClicked = async (option:{option:string}) => {
     arr_info.length = 0 //Clear array?
 
     if (option.option == FRIEND_ITEM_OPTIONS.CLOSE)
@@ -104,7 +104,17 @@ const FriendItemPopupItemClicked = (option:{option:string}) => {
     }
     else if (option.option == FRIEND_ITEM_OPTIONS.REMOVE_FRIEND)
     {
-        show_friend_info.value = false
+        try{
+            const remove_friend_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_RemoveFriend}`, {username: target_friend_username.value}, router)
+            if (remove_friend_result.code == CommonSuccessCode.APIRequestSuccess)
+            {
+                show_friend_info.value = false
+                window.location.reload()
+            }
+        }catch(e:any)
+        {
+
+        }
         //TODO
     }else if (option.option.startsWith(FRIEND_ITEM_OPTIONS.ADDRESS.replace("$user_address$", "")))
     {
