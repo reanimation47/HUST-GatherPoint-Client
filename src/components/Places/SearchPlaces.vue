@@ -242,6 +242,27 @@ const RedirectToGoogleMap = (place_id:string) => {
 
 }
 
+const RemovePlaceFromFavorites = async (place: DATA_PLACE_INFO) => {
+    reactive_fav_place_mapping.value?.set(place.place_id, false)
+    let location_info: LocationInfo = {
+        name: place.name,
+        lat: place.position.lat,
+        lng: place.position.lng,
+        place_id: place.place_id,
+        rating: place.rating.toString(),
+        vicinity: place.vicinity,
+        added_date: new Date().toISOString(),
+    }
+
+    try{
+        const save_place_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserRemovePlaceFromFavorites}`, {data:location_info}, router)
+        //TODO
+    }catch(e:any)
+    {
+
+    }
+
+}
 const SavePlaceToFavorites = async (place: DATA_PLACE_INFO) => {
     reactive_fav_place_mapping.value?.set(place.place_id, true)
     let location_info: LocationInfo = {
@@ -255,7 +276,8 @@ const SavePlaceToFavorites = async (place: DATA_PLACE_INFO) => {
     }
 
     try{
-        const save_place_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserSavePlaceToFavorites}`, {data:location_info}, router) as Get_Friend_Address_Response_Model
+        const save_place_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserSavePlaceToFavorites}`, {data:location_info}, router) 
+        //TODO
     }catch(e:any)
     {
 
@@ -370,7 +392,7 @@ const GoBackToInputScreen = async () => {
                                 <h3 class="text-ui-default-text-color">Rating: {{ location.rating }}*</h3>
                                 <button type="button" class="w-full h-7 rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="RedirectToGoogleMap(location.place_id)" ><i></i>Go!!!</button>
                                 <button v-if="!reactive_fav_place_mapping?.get(location.place_id)" type="button" class="w-full h-7 rounded-lg transition ease-in-out delay-0 bg-ui-default-love-color text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="SavePlaceToFavorites(location)" ><i></i>Save to favorites</button>
-                                <button v-if="reactive_fav_place_mapping?.get(location.place_id)" type="button" class="w-full h-7 rounded-lg transition ease-in-out delay-0 bg-ui-default-love-color text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="" ><i></i>Remove from favorites</button>
+                                <button v-if="reactive_fav_place_mapping?.get(location.place_id)" type="button" class="w-full h-7 rounded-lg transition ease-in-out delay-0 bg-ui-default-love-color text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="RemovePlaceFromFavorites(location)" ><i></i>Remove from favorites</button>
                             </div>
                         </InfoWindow>
                     </AdvancedMarker>>    
