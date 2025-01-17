@@ -17,6 +17,8 @@ import { ReqHelper } from '@/helpers/RequestsHelper';
 import { CoreConfiguration } from '@/configurations/coreConfig';
 import { API_URL } from '@/Models/API_Requests/API_Request_URLs';
 import { RouterHelper } from '@/helpers/RouterHelper';
+import { CommonErrorCode, CommonSuccessCode } from '@/Models/Common/ErrorCodes';
+import { RLinks } from '@/configurations/routerLinks';
 const props = defineProps({
     title: String,
     placeholder: String,
@@ -44,13 +46,21 @@ const trigger_autocomplete = async () => {
     if(props.title == eAddOption.AddFriend.toString())
     {
 
-        const get_friends_list_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_GetFriendsList}`, {}, router)
-        if (Array.isArray(get_friends_list_result.result))
-        {
-            if (Array.isArray(get_friends_list_result.result))
+        try{
+
+            const get_friends_list_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_GetFriendsList}`, {}, router)
+            if (get_friends_list_result.code == CommonErrorCode.UserIsNotAuthenticated)
+            {
+                // Why cant I redirect to Login page...
+                router.RouteToPage(RLinks.LoginPage)
+            }
+            if (get_friends_list_result.code == CommonSuccessCode.APIRequestSuccess && Array.isArray(get_friends_list_result.result))
             {
                 found_suggestions.value = (get_friends_list_result.result as Array<string>).filter(r => r.startsWith(user_input.value))
             }
+        }catch(e:any)
+        {
+            //TODO
         }
     }
 

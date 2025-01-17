@@ -22,8 +22,12 @@ import Dropdown from 'primevue/dropdown';
 import InputPopup from '../Modals/InputPopup.vue';
 import OptionsPopup from '../Modals/OptionsPopup.vue';
 import { eAddOption } from '@/core/clientEnums';
+import type { LocationInfo } from '@/Models/Database/DB_UserModel';
+import { AuthenticationHelper } from '@/helpers/AuthenticationHelper';
 
 //##### Add Addresses & Options screen here
+
+AuthenticationHelper.CheckIfUserIsAuthenticated()
 
 interface DATA_PLACE_INFO
 {
@@ -32,6 +36,7 @@ interface DATA_PLACE_INFO
     position: {lat:number,lng:number}
     rating:number 
     place_id:string
+    is_favorite: boolean
 }
 
 let router = new RouterHelper() 
@@ -71,6 +76,7 @@ const addOptions = ref([
 const pickedAddOption = ref()
 
 
+
 const GoBackButtonClicked = () => {
     router.RouteToPage(RLinks.PlacesPage)
 }
@@ -79,7 +85,10 @@ const AddButtonClicked = () => {
     showAddOption.value = true
 }
 
-const LetsGoButtonClicked = async () => {
+
+const reactive_fav_place_mapping = ref<Map<string,boolean>>()
+reactive_fav_place_mapping.value = new Map<string,boolean>()
+const StartSearchingForPlaces = async () => {
     const final_list_of_place_ids = Array.from(confirmedAddresses_placeId_Map.keys())
     console.log(final_list_of_place_ids)
     const request:Get_Best_Locations_Request_Model = {
@@ -93,21 +102,31 @@ const LetsGoButtonClicked = async () => {
 
     try{
         const get_best_locations_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Maps_Get_BestLocations_By_Adddresses}`, {request}, router) as Get_Best_Locations_Response_Model
-        console.log("results:")
-        console.log(get_best_locations_result)
+        // console.log("results:")
+        // console.log(get_best_locations_result)
         if (!Array.isArray(get_best_locations_result.result)) {throw Error("Bad data format from BE response")}
         unparsedDATA_best_locations = get_best_locations_result.result //store the data for future use
         maps_centerpoint = get_best_locations_result.centerpoint
         get_best_locations_result.result.forEach(result => {
             if(result?.geometry?.location?.lat && result?.geometry?.location?.lng && result?.name && result?.vicinity && result?.rating && result?.place_id)
             {
+
+                let target_place_fav_status = get_best_locations_result.map_favorite_places.find(place => place.place_id == result.place_id)?.is_favorite
+                if (target_place_fav_status == undefined)
+                {
+                    target_place_fav_status = false
+                }
+
+                reactive_fav_place_mapping.value?.set(result.place_id, target_place_fav_status)
+
                 maps_suggested_locations.push(result.geometry.location)
                 DATA_best_locations.push({
                     name: result.name,
                     vicinity: result.vicinity,
                     rating: +result.rating,
                     position: {lat:result.geometry.location.lat, lng:result.geometry.location.lng},
-                    place_id: result.place_id
+                    place_id: result.place_id,
+                    is_favorite: target_place_fav_status
                 })
             }
 
@@ -145,17 +164,22 @@ const UserConfirmInput = async (option: {input:string, found_suggestions_full_da
     if (pickedAddOption.value == eAddOption.AddFriend)
     {
         //TODO: handle error for this
-        const get_friends_address_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_GetFriendAddress}`, {username: option.input}, router) as Get_Friend_Address_Response_Model
-        if (get_friends_address_result.code == CommonSuccessCode.APIRequestSuccess && get_friends_address_result.address && get_friends_address_result.address_place_id)
-        {
-            if (!confirmedAddresses.value.includes(get_friends_address_result.address))
+        try{
+            const get_friends_address_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_GetFriendAddress}`, {username: option.input}, router) as Get_Friend_Address_Response_Model
+            if (get_friends_address_result.code == CommonSuccessCode.APIRequestSuccess && get_friends_address_result.address && get_friends_address_result.address_place_id)
             {
-                confirmedAddresses.value.push(get_friends_address_result.address)
-                confirmedAddresses_placeId_Map.set(get_friends_address_result.address_place_id, get_friends_address_result.address)
-            }
+                if (!confirmedAddresses.value.includes(get_friends_address_result.address))
+                {
+                    confirmedAddresses.value.push(get_friends_address_result.address)
+                    confirmedAddresses_placeId_Map.set(get_friends_address_result.address_place_id, get_friends_address_result.address)
+                }
         }else
         {
             return
+        }
+        }catch(e:any)
+        {
+
         }
     }
 
@@ -215,6 +239,27 @@ const RedirectToGoogleMap = (place_id:string) => {
     // window.open(query_url, '_blank')?.focus();
     router.RedirectToGoogleMap(place_id)
 
+
+}
+
+const SavePlaceToFavorites = async (place: DATA_PLACE_INFO) => {
+    reactive_fav_place_mapping.value?.set(place.place_id, true)
+    let location_info: LocationInfo = {
+        name: place.name,
+        lat: place.position.lat,
+        lng: place.position.lng,
+        place_id: place.place_id,
+        rating: place.rating.toString(),
+        vicinity: place.vicinity,
+        added_date: new Date().toISOString(),
+    }
+
+    try{
+        const save_place_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserSavePlaceToFavorites}`, {data:location_info}, router) as Get_Friend_Address_Response_Model
+    }catch(e:any)
+    {
+
+    }
 
 }
 
@@ -296,7 +341,7 @@ const GoBackToInputScreen = async () => {
             </ul>
 
             <div class="grid mx-20 h-11" v-if="readyToGo">
-                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="LetsGoButtonClicked" ><i></i>Lets Go</button>
+                <button type="button" class="rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="StartSearchingForPlaces" ><i></i>Lets Go</button>
             </div>
 
 
@@ -315,15 +360,17 @@ const GoBackToInputScreen = async () => {
                 :center="maps_centerpoint"
                 :zoom="15"
             >
-                <AdvancedMarker :options="center_markerOptions" :pin-options="center_pinOptions"/>
+                <!-- <AdvancedMarker :options="center_markerOptions" :pin-options="center_pinOptions"/> -->
                 <li v-for="location in DATA_best_locations">
-                    <AdvancedMarker :options="{position: location.position, title:location.name}" :pin-options="suggested_pinOptions">
+                    <AdvancedMarker :options="{position: location.position, title:location.name}" :pin-options="{ background: reactive_fav_place_mapping?.get(location.place_id) ? '#f43f5e':'#74A57F' }">
                         <InfoWindow>
-                            <div>
+                            <div class="grid gap-1">
                                 <h1 class="text-ui-default-text-color">{{ location.name }}</h1>
                                 <h2 class="text-ui-default-text-color">{{ location.vicinity}}</h2>
                                 <h3 class="text-ui-default-text-color">Rating: {{ location.rating }}*</h3>
                                 <button type="button" class="w-full h-7 rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="RedirectToGoogleMap(location.place_id)" ><i></i>Go!!!</button>
+                                <button v-if="!reactive_fav_place_mapping?.get(location.place_id)" type="button" class="w-full h-7 rounded-lg transition ease-in-out delay-0 bg-ui-default-love-color text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="SavePlaceToFavorites(location)" ><i></i>Save to favorites</button>
+                                <button v-if="reactive_fav_place_mapping?.get(location.place_id)" type="button" class="w-full h-7 rounded-lg transition ease-in-out delay-0 bg-ui-default-love-color text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="" ><i></i>Remove from favorites</button>
                             </div>
                         </InfoWindow>
                     </AdvancedMarker>>    

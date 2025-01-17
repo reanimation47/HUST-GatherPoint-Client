@@ -22,7 +22,9 @@ export default {
           'ui-default-text-color2': '#f8fafc',
           'ui-default-main-button': '#89A8B2',
           'ui-default-main-button2': '#284B63',
-          'ui-default-secondary-button': '#153243'
+          'ui-default-secondary-button': '#153243',
+          'ui-default-love-color': '#f87171',
+          'ui-default-love-color-on-hover': '#b91c1c',
 
         }
         

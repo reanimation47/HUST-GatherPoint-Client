@@ -30,7 +30,17 @@ export class ReqHelper
             if (data.code == CommonErrorCode.UserIsNotAuthenticated)
             {
                 sessionStorage.removeItem(LStorage.last_auth_token)
-                router.RouteToPage(RLinks.LoginPage)
+                try{
+                    router.RouteToPage(RLinks.LoginPage)
+                }catch
+                {
+                    try{
+                        window.location.reload()
+                    }catch{
+                        // ........... idk
+                    }
+                }
+
             }
             return Promise.resolve(data) 
         }catch
