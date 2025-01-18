@@ -14,4 +14,6 @@ export class RLinks
     static PlacesPage = "/places-main"
     static SavedPlaces = "/places-saved"
     static SearchPlaces = "/places-search"
+    static FavoritePlaces = "/places-favorites"
+    static ShareWithMePlaces = "/places-sharedwithme"
 }

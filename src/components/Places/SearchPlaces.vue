@@ -244,18 +244,12 @@ const RedirectToGoogleMap = (place_id:string) => {
 
 const RemovePlaceFromFavorites = async (place: DATA_PLACE_INFO) => {
     reactive_fav_place_mapping.value?.set(place.place_id, false)
-    let location_info: LocationInfo = {
-        name: place.name,
-        lat: place.position.lat,
-        lng: place.position.lng,
+    let location_info: any= {
         place_id: place.place_id,
-        rating: place.rating.toString(),
-        vicinity: place.vicinity,
-        added_date: new Date().toISOString(),
     }
 
     try{
-        const save_place_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserRemovePlaceFromFavorites}`, {data:location_info}, router)
+        const remove_place_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserRemovePlaceFromFavorites}`, {data:location_info}, router)
         //TODO
     }catch(e:any)
     {

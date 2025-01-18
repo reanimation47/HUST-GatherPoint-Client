@@ -11,6 +11,9 @@ import AddFriends from './components/Social/AddFriends.vue';
 import FriendsList from './components/Social/FriendsList.vue';
 import PlacesPage from './components/Places/PlacesPage.vue';
 import SearchPlaces from './components/Places/SearchPlaces.vue';
+import SavedPlacesList from './components/Places/SavedPlacesList.vue'
+import FavoritePlaces from './components/Places/FavoritePlaces.vue'
+import SharedWithMePlaces from './components/Places/SharedWithMePlaces.vue'
 import { RLinks } from './configurations/routerLinks'
 
 import PrimeVue from 'primevue/config';
@@ -34,6 +37,10 @@ const routes = [
 
   { path: RLinks.PlacesPage , name: RLinks.PlacesPage,  component: PlacesPage},
   { path: RLinks.SearchPlaces, name: RLinks.SearchPlaces,  component: SearchPlaces},
+  { path: RLinks.SavedPlaces, name: RLinks.SavedPlaces,  component: SavedPlacesList},
+
+  { path: RLinks.FavoritePlaces, name: RLinks.FavoritePlaces,  component: FavoritePlaces},
+  { path: RLinks.ShareWithMePlaces, name: RLinks.ShareWithMePlaces,  component: SharedWithMePlaces},
 ]
 
 const router = createRouter({
