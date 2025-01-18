@@ -29,6 +29,10 @@ const user_id = ref(sessionStorage.getItem(LStorage.last_entered_username) ?? "u
 const list_saved_places = ref()
 
 onBeforeMount( async () => {
+    await LoadFavoritePlacesFromServer()
+})
+
+const LoadFavoritePlacesFromServer = async () =>{
     try{
         const get_fav_places_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserGetPlacesFromFavorites}`, {}, router) 
         if (get_fav_places_result.code == CommonSuccessCode.APIRequestSuccess) 
@@ -39,7 +43,7 @@ onBeforeMount( async () => {
     {
         //TODO
     }
-})
+}
 
 
 
@@ -87,7 +91,11 @@ const ItemClicked = async (item: any) => {
     }
 }
 
+const is_processing_button_click = ref(false)
 const PopupItemButtonClicked = async (option: any) => {
+    if (is_processing_button_click.value) {return}
+    is_processing_button_click.value = true
+
     option = option.option
     if (option == eItemPopupOptions.CLOSE)
     {
@@ -95,6 +103,28 @@ const PopupItemButtonClicked = async (option: any) => {
     }
     else if(option == eItemPopupOptions.REMOVE)
     {
+        let location_info: any= {
+            place_id: target_clicked_place.value.place_id,
+        }
+
+        try{
+            const remove_place_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserRemovePlaceFromFavorites}`, {data:location_info}, router)
+            show_place_info_popup.value = false
+            if (remove_place_result.code == CommonSuccessCode.APIRequestSuccess)
+            {
+                //Get the newly updated list
+                LoadFavoritePlacesFromServer()
+            }else
+            {
+                is_processing_button_click.value = false
+                throw Error()
+            }
+
+        }catch(e:any)
+        {
+
+        }
+
 
     }
     else if(option == eItemPopupOptions.REDIRECT_TO_GGMAP)
@@ -102,6 +132,8 @@ const PopupItemButtonClicked = async (option: any) => {
         router.RedirectToGoogleMap(target_clicked_place.value.place_id)
         //TODO: redirect to GG maps
     }
+
+    is_processing_button_click.value = false
 
 }
 
