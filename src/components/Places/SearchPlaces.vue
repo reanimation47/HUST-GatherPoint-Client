@@ -1,7 +1,7 @@
 
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
-import {type Get_Best_Locations_Request_Model, type UserLoginRequestModel, type UserRegisterRequestModel } from '../../Models/API_Requests/API_Request_Models'
+import {type Get_Best_Locations_Request_Model, type UserLoginRequestModel, type UserRegisterRequestModel, type UserSharePlaceWithFriendsRequestModel } from '../../Models/API_Requests/API_Request_Models'
 import {API_URL} from '../../Models/API_Requests/API_Request_URLs'
 import {APIErrorCode, CommonSuccessCode, NetworkErrorCode} from '../../Models/Common/ErrorCodes'
 import {type Get_Best_Locations_Response_Model, type Get_Friend_Address_Response_Model, type UserLoginResponseModel} from '../../Models/API_Responses/API_Response_Models'
@@ -37,6 +37,7 @@ interface DATA_PLACE_INFO
     rating:number 
     place_id:string
     is_favorite: boolean
+    shared_with_friends?: boolean
 }
 
 let router = new RouterHelper() 
@@ -155,8 +156,11 @@ const UserPickedAddOption = async (option: {option:string}) =>
     }
 }
 
+const confirmed_added_friends: Ref<string[], string[]> = ref([])
+
 const confirmedAddresses: Ref<string[], string[]> = ref([])
 const confirmedAddresses_placeId_Map = new Map<string,string>() //<place_id,address>
+
 const UserConfirmInput = async (option: {input:string, found_suggestions_full_data:any}) => {
     // console.log(option.input)
     showUserInputBox.value = false 
@@ -165,6 +169,11 @@ const UserConfirmInput = async (option: {input:string, found_suggestions_full_da
     {
         //TODO: handle error for this
         try{
+            if (!confirmed_added_friends.value.includes(option.input))
+            {
+                confirmed_added_friends.value.push(option.input)
+            }
+
             const get_friends_address_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_GetFriendAddress}`, {username: option.input}, router) as Get_Friend_Address_Response_Model
             if (get_friends_address_result.code == CommonSuccessCode.APIRequestSuccess && get_friends_address_result.address && get_friends_address_result.address_place_id)
             {
@@ -242,6 +251,35 @@ const RedirectToGoogleMap = (place_id:string) => {
 
 }
 
+const reactive_shared_places_mapping = ref<Map<string,boolean>>()
+reactive_shared_places_mapping.value = new Map<string, boolean>()
+const SharePlaceWithAddedFriends = async (place: DATA_PLACE_INFO) => {
+    try{
+        reactive_shared_places_mapping.value?.set(place.place_id, true)
+        place.shared_with_friends = true
+
+        const place_info: LocationInfo = {
+            name: place.name,
+            vicinity: place.vicinity,
+            lat: place.position.lat,
+            lng: place.position.lng,
+            rating: place.rating.toString(),
+            place_id: place.place_id,
+            added_date: new Date().toISOString()
+
+
+        }
+        const share_data: UserSharePlaceWithFriendsRequestModel = {
+            place: place_info,
+            friends: confirmed_added_friends.value
+        }
+        const share_place_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserSharePlaceWithFriends}`, {data:share_data}, router)
+        //TODO
+    }catch(e:any)
+    {
+
+    }
+}
 const RemovePlaceFromFavorites = async (place: DATA_PLACE_INFO) => {
     reactive_fav_place_mapping.value?.set(place.place_id, false)
     let location_info: any= {
@@ -384,9 +422,10 @@ const GoBackToInputScreen = async () => {
                                 <h1 class="text-ui-default-text-color">{{ location.name }}</h1>
                                 <h2 class="text-ui-default-text-color">{{ location.vicinity}}</h2>
                                 <h3 class="text-ui-default-text-color">Rating: {{ location.rating }}*</h3>
-                                <button type="button" class="w-full h-7 rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="RedirectToGoogleMap(location.place_id)" ><i></i>Go!!!</button>
+                                <button type="button" class="w-full h-7 rounded-lg transition ease-in-out delay-0 bg-ui-default-main-button2 text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="RedirectToGoogleMap(location.place_id)" ><i></i>Visit on GoogleMaps</button>
                                 <button v-if="!reactive_fav_place_mapping?.get(location.place_id)" type="button" class="w-full h-7 rounded-lg transition ease-in-out delay-0 bg-ui-default-love-color text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="SavePlaceToFavorites(location)" ><i></i>Save to favorites</button>
                                 <button v-if="reactive_fav_place_mapping?.get(location.place_id)" type="button" class="w-full h-7 rounded-lg transition ease-in-out delay-0 bg-ui-default-love-color text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="RemovePlaceFromFavorites(location)" ><i></i>Remove from favorites</button>
+                                <button v-if="!reactive_shared_places_mapping?.get(location.place_id)" type="button" class="w-full h-7 rounded-lg transition ease-in-out delay-0 bg-ui-default-love-color text-ui-default-text-color2 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300"  @click="SharePlaceWithAddedFriends(location)" ><i></i>Share with added friends</button>
                             </div>
                         </InfoWindow>
                     </AdvancedMarker>>    

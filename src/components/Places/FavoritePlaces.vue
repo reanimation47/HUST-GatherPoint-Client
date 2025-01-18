@@ -181,6 +181,7 @@ const PopupItemButtonClicked = async (option: any) => {
 
             <div>
                 <ul class="grid grid-flow-row grid-cols-1 gap-2 mt-4 mx-7">
+                <h3 class="text-center text-xl text-ui-default-text-color">Favorite Places:</h3>
                     <li class="" v-for="place in list_saved_places" >
                         <button type="button" class="text-ui-default-text-color2 rounded-lg min-h-10 w-full transition ease-in-out delay-0 bg-friend-list-item hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="ItemClicked(place)">{{ place.name }}</button>
                     </li>
