@@ -17,6 +17,7 @@ import OptionsPopup from '../Modals/OptionsPopup.vue';
 import { RLinks } from '@/configurations/routerLinks';
 import { Capacitor } from '@capacitor/core';
 import { RouterHelper } from '@/helpers/RouterHelper';
+import type { LocationInfo } from '@/Models/Database/DB_UserModel';
 let router = new RouterHelper() 
 
 
@@ -24,34 +25,25 @@ const titleText = ref("Logged in as") //TODO: reminder to maybe unify this tittl
 const user_id = ref(sessionStorage.getItem(LStorage.last_entered_username) ?? "unknown") //TODO: should we even display unknown? Or just force user to log in again..
 // const username_placeholder = ref("Enter username????")
 
-const eOptions = {
-    FavoritePlaces: "Favorite Places",
-    SharedWithMe: "Shared With Me",
-}
 
-const options_saved_places = ref([
-    eOptions.FavoritePlaces,
-    eOptions.FavoritePlaces,
-    eOptions.FavoritePlaces,
-    eOptions.FavoritePlaces,
-    eOptions.FavoritePlaces,
-    eOptions.SharedWithMe,
-])
+const list_saved_places = ref()
 
 onBeforeMount( async () => {
-    // console.log("before?")
-    // // Get the friend list from server
-    // const get_friends_list_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_GetFriendsList}`, {}, router)
-    // console.log(get_friends_list_result.code)
-    // console.log(get_friends_list_result.result)
-    // console.log(Array.isArray(get_friends_list_result.result))
-    // if (Array.isArray(get_friends_list_result.result))
-    // {
-    //     options_saved_places.value = get_friends_list_result.result
-    //     console.log(get_friends_list_result.result)
-    // }
+    await LoadSharedWithPlacesFromServer()
 })
 
+const LoadSharedWithPlacesFromServer = async () =>{
+    try{
+        const get_fav_places_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserGetSharedWithPlaces}`, {}, router) 
+        if (get_fav_places_result.code == CommonSuccessCode.APIRequestSuccess) 
+        {
+            list_saved_places.value = (get_fav_places_result.result as LocationInfo[])
+        }
+    }catch(e)
+    {
+        //TODO
+    }
+}
 
 
 
@@ -60,71 +52,94 @@ const GoBack = () => {
     router.RouteToPage(RLinks.SavedPlaces)
 }
 
-//Friend Items 
+//Place Items 
 
-const FRIEND_ITEM_OPTIONS = {
-    ADDRESS: "Address: $user_address$",
-    REMOVE_FRIEND: "Remove Friend",
-    CLOSE: "Close"
+const eItemPopupOptions = {
+    CLOSE: "Close",
+    REMOVE: "Remove from this list",
+    ADDRESS: "Address: $place_address$",
+    RATING: "Rating: $rating$*",
+    SHARED_BY: "Shared by: $username$",
+    REDIRECT_TO_GGMAP: "See place on Google Map",
 }
-const arr_info:string[] = []
-const show_friend_info = ref(false)
-const friend_info_options = ref(arr_info)
 
-const target_friend_username = ref("")
-let target_friend_address_place_id = "" //Store most recently selected friend's address's place_id
-const FriendItemClicked = async (friend_username: string) => {
+const ItemPopup_ButtonOptions: string[] = []
+const ItemPopup_Descriptions: string[] = []
 
+const show_place_info_popup = ref(false)
+const target_clicked_place = ref()
+
+const ItemClicked = async (item: any) => {
+    //reset 
+    ItemPopup_ButtonOptions.length = 0
+    ItemPopup_Descriptions.length = 0
+
+    let place_info = item as LocationInfo
+    target_clicked_place.value = place_info
     try {
-        const get_friends_address_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_GetFriendAddress}`, {username: friend_username}, router) as Get_Friend_Address_Response_Model
-        if (get_friends_address_result.code == CommonSuccessCode.APIRequestSuccess && get_friends_address_result.address && get_friends_address_result.address_place_id)
-        {
-            arr_info.push(FRIEND_ITEM_OPTIONS.ADDRESS.replace("$user_address$", get_friends_address_result.address))
-            target_friend_address_place_id = get_friends_address_result.address_place_id
-        }else
-        {
-            arr_info.push("Error trying to retrieve this user's address")
-        }
+        show_place_info_popup.value = true
+        const str_address = eItemPopupOptions.ADDRESS.replace("$place_address$", place_info.vicinity)
+        const rating = eItemPopupOptions.RATING.replace("$rating$", place_info.rating)
+        const shared_by = eItemPopupOptions.SHARED_BY.replace("$username$", place_info.shared_by ?? "Unknown")
+
+        ItemPopup_Descriptions.push(str_address)
+        ItemPopup_Descriptions.push(rating)
+        ItemPopup_Descriptions.push(shared_by)
+        ItemPopup_ButtonOptions.push(eItemPopupOptions.REDIRECT_TO_GGMAP)
+        ItemPopup_ButtonOptions.push(eItemPopupOptions.REMOVE)
+        ItemPopup_ButtonOptions.push(eItemPopupOptions.CLOSE)
+        //TODO
     }catch
     {
-        arr_info.push("Error trying to retrieve this user's address")
     }
-
-    arr_info.push(FRIEND_ITEM_OPTIONS.REMOVE_FRIEND)
-    arr_info.push(FRIEND_ITEM_OPTIONS.CLOSE)
-    target_friend_username.value = friend_username
-    show_friend_info.value = true
-    //TODO
 }
 
-const FriendItemPopupItemClicked = async (option:{option:string}) => {
-    arr_info.length = 0 //Clear array?
+const is_processing_button_click = ref(false)
+const PopupItemButtonClicked = async (option: any) => {
+    if (is_processing_button_click.value) {return}
+    is_processing_button_click.value = true
 
-    if (option.option == FRIEND_ITEM_OPTIONS.CLOSE)
+    option = option.option
+    if (option == eItemPopupOptions.CLOSE)
     {
-        show_friend_info.value = false
+        show_place_info_popup.value = false
     }
-    else if (option.option == FRIEND_ITEM_OPTIONS.REMOVE_FRIEND)
+    else if(option == eItemPopupOptions.REMOVE)
     {
+        let location_info: any= {
+            place_id: target_clicked_place.value.place_id,
+        }
+
         try{
-            const remove_friend_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.Socials_RemoveFriend}`, {username: target_friend_username.value}, router)
-            if (remove_friend_result.code == CommonSuccessCode.APIRequestSuccess)
+            const remove_place_result = await ReqHelper.SendPostRequest(`${CoreConfiguration.backend_url}${API_URL.UserRemoveSharedWithPlace}`, {data:location_info}, router)
+            show_place_info_popup.value = false
+            if (remove_place_result.code == CommonSuccessCode.APIRequestSuccess)
             {
-                show_friend_info.value = false
-                window.location.reload()
+                //Get the newly updated list
+                LoadSharedWithPlacesFromServer()
+            }else
+            {
+                is_processing_button_click.value = false
+                throw Error()
             }
+
         }catch(e:any)
         {
 
         }
-        //TODO
-    }else if (option.option.startsWith(FRIEND_ITEM_OPTIONS.ADDRESS.replace("$user_address$", "")))
+
+
+    }
+    else if(option == eItemPopupOptions.REDIRECT_TO_GGMAP)
     {
-        router.RedirectToGoogleMap(target_friend_address_place_id)
+        router.RedirectToGoogleMap(target_clicked_place.value.place_id)
+        //TODO: redirect to GG maps
     }
 
+    is_processing_button_click.value = false
 
 }
+
 
 </script>
 
@@ -142,19 +157,19 @@ const FriendItemPopupItemClicked = async (option:{option:string}) => {
 </head>
 <body class="bg-ui-default-bg-color grid grid-cols-1 h-screen w-screen place-content-center" >
 
-        <Teleport to="body" v-if="show_friend_info">
+        <Teleport to="body" v-if="show_place_info_popup">
             <div class="modal">
                 <options-popup
-                    :title=target_friend_username
+                    :title=target_clicked_place.name
                     placeholder="input here pls"
                     buttonText="Confirm"
-                    :options="friend_info_options"
-                    @confirm="FriendItemPopupItemClicked"
+                    :options="ItemPopup_ButtonOptions"
+                    :descriptions="ItemPopup_Descriptions"
+                    @confirm="PopupItemButtonClicked"
                 />
                 
             </div>
         </Teleport>
-
         <div class="m-12 rounded-lg gap-2 pt-5 pb-7 bg-ui-box-color">
 
             <div class="min-h-10 rounded-lg shadow">
@@ -169,8 +184,9 @@ const FriendItemPopupItemClicked = async (option:{option:string}) => {
 
             <div>
                 <ul class="grid grid-flow-row grid-cols-1 gap-2 mt-4 mx-7">
-                    <li class="" v-for="friend in options_saved_places" >
-                        <button type="button" class="text-ui-default-text-color2 rounded-lg min-h-10 w-full transition ease-in-out delay-0 bg-friend-list-item hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="FriendItemClicked(friend)">{{ friend }}</button>
+                <h3 class="text-center text-xl text-ui-default-text-color">Shared with me:</h3>
+                    <li class="" v-for="place in list_saved_places" >
+                        <button type="button" class="text-ui-default-text-color2 rounded-lg min-h-10 w-full transition ease-in-out delay-0 bg-friend-list-item hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300" @click="ItemClicked(place)">{{ place.name }}</button>
                     </li>
                 </ul>
             </div>
