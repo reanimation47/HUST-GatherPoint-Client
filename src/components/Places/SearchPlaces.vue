@@ -131,10 +131,23 @@ const StartSearchingForPlaces = async () => {
                 })
             }
 
+            get_best_locations_result.friends_geocodes.forEach((geocode, index) => {
+                const friends_locations_info = {
+                    lat: geocode.lat,
+                    lng: geocode.lng,
+                    title: getStringBeforeComma(confirmedInputs.value[index]) ?? "Unknown" //Very .. not safe 
+                }
+                DATA_Friends_Locations.push(friends_locations_info)
+
+            })
+
+
         })
         MapUpdated()
 
         showBestLocations.value = true
+
+        default_show_inputs_infowindows_on_start.value = true
     }catch(e)
     {
         console.log("TODO: LETS GO ERROR")
@@ -161,6 +174,9 @@ const confirmed_added_friends: Ref<string[], string[]> = ref([])
 const confirmedAddresses: Ref<string[], string[]> = ref([])
 const confirmedAddresses_placeId_Map = new Map<string,string>() //<place_id,address>
 
+const confirmedInputs: Ref<string[], string[]> = ref([]) //Friend's names + manual addresses (Ex: ["danny2", "quynh3", "123 Hoang Dao Thuy", ... ])
+const default_show_inputs_infowindows_on_start = ref(true)
+
 const UserConfirmInput = async (option: {input:string, found_suggestions_full_data:any}) => {
     // console.log(option.input)
     showUserInputBox.value = false 
@@ -182,10 +198,13 @@ const UserConfirmInput = async (option: {input:string, found_suggestions_full_da
                     confirmedAddresses.value.push(get_friends_address_result.address)
                     confirmedAddresses_placeId_Map.set(get_friends_address_result.address_place_id, get_friends_address_result.address)
                 }
-        }else
-        {
-            return
-        }
+
+                //Add friend's name
+                confirmedInputs.value.push(option.input)
+            }else
+            {
+                return
+            }
         }catch(e:any)
         {
 
@@ -200,6 +219,8 @@ const UserConfirmInput = async (option: {input:string, found_suggestions_full_da
             const target_address_data = option.found_suggestions_full_data.find((data:any) => data.description == option.input)
             confirmedAddresses_placeId_Map.set(target_address_data.place_id, option.input)
             confirmedAddresses.value.push(option.input)
+
+            confirmedInputs.value.push(option.input)
         }
     }
 
@@ -237,6 +258,8 @@ const suggested_pinOptions = { background: '#74A57F' }
 
 let unparsedDATA_best_locations:any
 let DATA_best_locations:DATA_PLACE_INFO[] = []
+let DATA_Friends_Locations: {lat:number, lng:number, title: string}[] = []
+
 const MapUpdated = () =>{
     // maps_centerpoint = { lat: 40.689247, lng: -74.044502 }
     // maps_suggested_locations = []
@@ -319,6 +342,14 @@ const SavePlaceToFavorites = async (place: DATA_PLACE_INFO) => {
 
 const GoBackToInputScreen = async () => {
     showBestLocations.value = false
+}
+
+function getStringBeforeComma(input: string): string {
+    const commaIndex = input.indexOf(',');
+    if (commaIndex === -1) {
+        return input; // Return the whole string if there's no comma
+    }
+    return input.substring(0, commaIndex);
 }
 
 </script>
@@ -430,7 +461,19 @@ const GoBackToInputScreen = async () => {
                         </InfoWindow>
                     </AdvancedMarker>>    
                 </li>
+
+                <li v-for="location in DATA_Friends_Locations">
+                    <AdvancedMarker :options="{position: {lat: location.lat, lng: location.lng}, title: location.title}" :pin-options="{ background: '#171717' }">
+                        <InfoWindow v-model="default_show_inputs_infowindows_on_start">
+                            <div class="grid gap-1">
+                                <h1 class="text-ui-default-text-color">{{ location.title}}</h1>
+                            </div>
+                        </InfoWindow>
+                    </AdvancedMarker>>    
+
+                </li>
             </GoogleMap>
+
 
         </div>
 
